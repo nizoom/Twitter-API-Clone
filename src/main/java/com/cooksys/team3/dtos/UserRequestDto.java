@@ -5,13 +5,7 @@ import java.util.List;
 
 import com.cooksys.team3.entities.User;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
-@Data
-
-public class UserResponseDto {
+public class UserRequestDto {
 
 	private String username;
 	
@@ -34,6 +28,4 @@ public class UserResponseDto {
 	private List<User> following;
 	
 	private List<Tweet> tweets;
-	
-	
 }
