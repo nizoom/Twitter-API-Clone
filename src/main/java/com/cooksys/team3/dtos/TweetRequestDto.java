@@ -1,6 +1,7 @@
 package com.cooksys.team3.dtos;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ public class TweetRequestDto {
 	
 	private int author;
 	
-	private Timestamp timestamp; 
+	private Timestamp posted; 
 	
 	private boolean deleted;
 	
@@ -21,5 +22,7 @@ public class TweetRequestDto {
 	private int inReplyTo;
 	
 	private int repostOf;
+	
+	private List <TweetHashtags> tweetHashtags;
 
 }
