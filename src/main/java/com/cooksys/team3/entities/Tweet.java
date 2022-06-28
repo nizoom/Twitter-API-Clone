@@ -1,6 +1,7 @@
 package com.cooksys.team3.entities;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -49,7 +50,7 @@ public class Tweet {
 	private int repostOf;
 	
 	@OneToMany(mappedBy = "repostOf")
-	private List<Tweet> repostTweets;
+	private List<Tweet> repostTweets = new ArrayList<>();
 	
 	@ManyToMany
 	@JoinTable
@@ -58,9 +59,9 @@ public class Tweet {
 	// There are two ManyToMany relationships between Tweet and User: user_likes and user_mentions
 	@ManyToMany
 	@JoinTable
-	private List<User> userLikes;
+	private List<User> userLikes = new ArrayList<>();
 	
 	@ManyToMany
 	@JoinTable
-	private List<User> userMentions;
+	private List<User> userMentions = new ArrayList<>();
 }
