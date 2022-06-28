@@ -6,9 +6,15 @@ import org.mapstruct.Mapping;
 import com.cooksys.team3.dtos.UserResponseDto;
 import com.cooksys.team3.entities.User;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 
 public interface UserMapper {
 	@Mapping(target="username", source="credentials.username")
 	UserResponseDto entityToDto(User entity);
+
+
+	@Mapping(target="username", source="credentials.username")
+	List<UserResponseDto> entityToDto(List<User> users);
 }

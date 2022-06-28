@@ -5,7 +5,11 @@ import org.springframework.stereotype.Repository;
 
 import com.cooksys.team3.entities.User;
 
+import java.util.List;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
+
+    List<User> findAllByDeletedFalse();
 
 }
