@@ -35,25 +35,26 @@ public class User {
 
 	@Embedded
 	private Credentials credentials;
-
-	@Column(nullable = false)
+	
+	@Column(nullable=false, updatable = false)
 	private Timestamp joined;
 
 	private boolean deleted;
 
 	@ManyToMany
 	@JoinTable
-	private List<User> followers;
-
-	@ManyToMany(mappedBy = "followers")
-	private List<User> following;
-
-	@OneToMany(mappedBy = "author")
+	private List<User> followers = new ArrayList<>();
+	
+	@ManyToMany(mappedBy="followers")
+	private List<User> following = new ArrayList<>();
+	
+	@ManyToMany(mappedBy="userLikes")
+	private List<Tweet> likes = new ArrayList<>();
+	
+	@ManyToMany(mappedBy="userMentions")
+	private List<Tweet> mentions = new ArrayList<>();
+	
+	@OneToMany(mappedBy="author")
 	private List<Tweet> tweets = new ArrayList<>();
-	
-	@ManyToMany(mappedBy = "userLikes")
-	private List<Tweet> userLikes = new ArrayList<>();
-	
-	@ManyToMany(mappedBy = "userMentions")
-	private List<Tweet> userMentions = new ArrayList<>();
+
 }
