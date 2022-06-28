@@ -11,18 +11,12 @@ import java.util.List;
 
 public class TweetResponseDto {
 	
-	private int author;
-	
 	private Timestamp posted; 
-	
-	private boolean deleted;
 	
 	private String content;
 	
-	private int inReplyTo;
+	private CredentialsDto credentialsDto;
 	
-	private int repostOf;
-	
-	private List <TweetHashtags> tweetHashtags;
+
 	
 }
