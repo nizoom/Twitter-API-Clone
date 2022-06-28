@@ -7,7 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import lombok.Data;
@@ -22,14 +21,15 @@ public class Hashtag {
 	@GeneratedValue
 	private Long id;
 	
-	@ManyToMany
-	@JoinTable
 	@Column(nullable = false, unique = true)
-	private List<String> labels;
+	private String label;
 	
 	@Column(nullable = false, updatable = false)
 	private Timestamp firstUsed;
 	
 	@Column(nullable = false)
 	private Timestamp lastUsed;
+	
+	@ManyToMany(mappedBy = "hashtags")
+	private List<Tweet> tweets;
 }
