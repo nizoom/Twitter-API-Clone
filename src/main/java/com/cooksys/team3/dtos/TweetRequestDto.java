@@ -11,18 +11,8 @@ import lombok.NoArgsConstructor;
 
 public class TweetRequestDto {
 	
-	private int author;
-	
-	private Timestamp posted; 
-	
-	private boolean deleted;
-	
 	private String content;
 	
-	private int inReplyTo;
-	
-	private int repostOf;
-	
-	private List <TweetHashtags> tweetHashtags;
+	private CredentialsDto credentialsDto;
 
 }

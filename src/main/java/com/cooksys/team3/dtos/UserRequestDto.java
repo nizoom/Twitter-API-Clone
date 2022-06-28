@@ -6,26 +6,9 @@ import java.util.List;
 import com.cooksys.team3.entities.User;
 
 public class UserRequestDto {
-
-	private String username;
 	
-	private String password;
+	private CredentialsDto credentialsDto;
 	
-	private Timestamp joined;
+	private ProfileDto profileDto;	
 	
-	private boolean deleted;
-	
-	private String firstName;
-	
-	private String lastName;
-	
-	private String email;
-	
-	private String phone; 
-	
-	private List<User> followers;
-	
-	private List<User> following;
-	
-	private List<Tweet> tweets;
 }
