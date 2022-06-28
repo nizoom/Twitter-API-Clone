@@ -21,7 +21,7 @@ public class UserRequestDto {
 	
 	private String email;
 	
-	private String phoneNumber; 
+	private String phone; 
 	
 	private List<User> followers;
 	
