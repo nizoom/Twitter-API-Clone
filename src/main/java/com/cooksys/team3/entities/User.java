@@ -1,6 +1,7 @@
 package com.cooksys.team3.entities;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.cooksys.team3.embeddables.Credentials;
@@ -34,15 +36,25 @@ public class User {
 	@Embedded
 	private Credentials credentials;
 	
-	@Column(nullable=false)
+	@Column(nullable=false, updatable = false)
 	private Timestamp joined;
 	
 	private boolean deleted;
 	
 	@ManyToMany
 	@JoinTable
-	private List<User> followers;
+	private List<User> followers = new ArrayList<>();
 	
 	@ManyToMany(mappedBy="followers")
-	private List<User> following;
+	private List<User> following = new ArrayList<>();
+	
+	@ManyToMany(mappedBy="userLikes")
+	private List<Tweet> likes = new ArrayList<>();
+	
+	@ManyToMany(mappedBy="userMentions")
+	private List<Tweet> mentions = new ArrayList<>();
+	
+	@OneToMany(mappedBy="author")
+	private List<Tweet> tweets = new ArrayList<>();
+	
 }
