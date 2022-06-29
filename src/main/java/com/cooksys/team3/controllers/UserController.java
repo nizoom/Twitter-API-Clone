@@ -14,39 +14,41 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
- private final UserService userService;
+	private final UserService userService;
 
+	@GetMapping
+	public List<UserResponseDto> getUsers() {
+		return userService.getUsers();
+	}
 
- @GetMapping
+	@GetMapping("/@{username}/followers")
 
- public List<UserResponseDto> getUsers() {
-  return userService.getUsers();
- }
+	public List<UserResponseDto> getFollowers(@PathVariable String username) {
+		return userService.getFollowers(username);
+	}
 
+	@GetMapping("/@{username}/tweets")
 
- @GetMapping("/@{username}/followers")
+	public List<TweetResponseDto> getTweets(@PathVariable String username) {
+		return userService.getTweets(username);
+	}
 
- public List<UserResponseDto> getFollowers(@PathVariable String username){
-  return userService.getFollowers(username);
- }
+	@GetMapping("/@{username}/feed")
 
- @GetMapping("/@{username}/tweets")
+	public List<TweetResponseDto> getFeed(@PathVariable String username) {
+		return userService.getFeed(username);
+	}
 
- public List<TweetResponseDto> getTweets(@PathVariable String username){
-  return userService.getTweets(username);
- }
+	@PatchMapping("/@{username}")
 
- @GetMapping("/@{username}/feed")
+	public UserResponseDto updateUsername(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
+		return userService.updateUsername(username, userRequestDto);
+	}
 
- public List<TweetResponseDto> getFeed(@PathVariable String username){
-  return userService.getFeed(username);
- }
-
- @PatchMapping("/@{username}")
-
- public UserResponseDto updateUsername(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
-  return userService.updateUsername(username, userRequestDto);
- }
-
+	@GetMapping("/@{username}/mentions")
+	
+	public List<TweetResponseDto> getMentions(@PathVariable String username) {
+		return userService.getMentions(username);
+	}
 
 }
