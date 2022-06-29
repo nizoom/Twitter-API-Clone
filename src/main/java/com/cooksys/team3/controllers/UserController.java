@@ -50,5 +50,11 @@ public class UserController {
 	public List<TweetResponseDto> getMentions(@PathVariable String username) {
 		return userService.getMentions(username);
 	}
+	
+	@GetMapping("/@{username}/following")
+	
+	public List<UserResponseDto> getFollowing(@PathVariable String username) {
+		return userService.getFollowing(username);
+	}
 
 }

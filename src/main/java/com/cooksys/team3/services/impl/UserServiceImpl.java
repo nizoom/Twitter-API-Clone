@@ -94,4 +94,24 @@ public class UserServiceImpl implements UserService {
 		response.sort(Comparator.comparing(Tweet::getPosted).reversed());
 		return tweetMapper.entitiesToDtos(response);
 	}
+
+	@Override
+	public List<UserResponseDto> getFollowing(String username) {
+		Optional<User> requestedUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+		
+		if(requestedUser.isEmpty()) {
+			throw new NotFoundException("Specified user could not be found");
+		}
+		User user = requestedUser.get();
+		
+		List<User> response = new ArrayList<>();
+		List<User> following = user.getFollowing();
+		for(User followedUser : following) {
+			if(!followedUser.isDeleted()) {
+				response.add(followedUser);
+			}
+		}
+		
+		return userMapper.entityToDto(response);
+	}
 }
