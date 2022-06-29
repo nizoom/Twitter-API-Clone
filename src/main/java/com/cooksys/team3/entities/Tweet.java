@@ -26,10 +26,9 @@ public class Tweet {
 	@GeneratedValue
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "user_table_id")
-	@Column(nullable = false)
-	private int author;
+	@ManyToOne(targetEntity = User.class)
+	@JoinColumn(name = "authorTweets", nullable = false)
+	private Integer author;
 	
 	@Column(nullable = false, updatable = false)
 	private Timestamp posted;
@@ -38,15 +37,15 @@ public class Tweet {
 	
 	private String content;
 	
-	@ManyToOne
-	@JoinColumn(name = "tweet_id")
+	@ManyToOne(targetEntity = Tweet.class)
+	@JoinColumn(name = "replyTweets")
 	private int inReplyTo;
 	
 	@OneToMany(mappedBy = "inReplyTo")
 	private List<Tweet> replyTweets;
 	
-	@ManyToOne
-	@JoinColumn(name = "tweet_id")
+	@ManyToOne(targetEntity = Tweet.class)
+	@JoinColumn(name = "repostTweets")
 	private int repostOf;
 	
 	@OneToMany(mappedBy = "repostOf")
