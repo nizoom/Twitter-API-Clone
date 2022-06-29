@@ -16,7 +16,6 @@ public class TweetResponseDto {
 	private String content;
 	
 	private CredentialsDto credentialsDto;
-	
 
 	
 }
