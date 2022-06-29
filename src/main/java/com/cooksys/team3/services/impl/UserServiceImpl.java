@@ -114,4 +114,14 @@ public class UserServiceImpl implements UserService {
 		
 		return userMapper.entityToDto(response);
 	}
+
+	@Override
+	public UserResponseDto getUser(String username) {
+		Optional<User> requestedUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+		
+		if(requestedUser.isEmpty()) {
+			throw new NotFoundException("Specified user could not be found");
+		}
+		return userMapper.entityToDto(requestedUser.get());
+	}
 }
