@@ -1,11 +1,9 @@
 package com.cooksys.team3.mappers;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.mapstruct.Mapper;
 
-import com.cooksys.team3.dtos.ContextDto;
 import com.cooksys.team3.dtos.TweetRequestDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
 import com.cooksys.team3.entities.Tweet;

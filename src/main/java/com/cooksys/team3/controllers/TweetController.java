@@ -48,6 +48,11 @@ public class TweetController {
 	public List<TweetResponseDto> getReposts(@PathVariable Long id) {
 		return tweetService.getReposts(id);
 	}
+	
+	@GetMapping("/{id}/context")
+	public ContextDto getContextOfTweet(@PathVariable Long id) {
+		return tweetService.getContextOfTweet(id);
+	}
 
 	@PostMapping("/{id}/like")
 	public void likeTweet(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto) {

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.cooksys.team3.dtos.ContextDto;
 import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
 import com.cooksys.team3.dtos.UserRequestDto;
@@ -108,7 +109,7 @@ public class TweetServiceImpl implements TweetService {
 		return tweetMapper.entitiesToDtos(replyChain);
 
 	}
-	
+
 	@Override
 	public List<TweetResponseDto> getReposts(Long id) {
 		List<Tweet> allRepostTweets = validateTweet(id).get().getRepostTweets();
@@ -119,8 +120,57 @@ public class TweetServiceImpl implements TweetService {
 				nonDeletedRepostTweets.add(tweet);
 			}
 		}
-		
+
 		return tweetMapper.entitiesToDtos(nonDeletedRepostTweets);
+	}
+
+	@Override
+	public ContextDto getContextOfTweet(Long id) {
+		// ContextDto contain variables not in Tweet entity so create ContextDto here
+		ContextDto contextDto = new ContextDto();
+		
+		Tweet tweet = validateTweet(id).get();
+		
+		// Set the current tweet
+		contextDto.setTarget(tweetMapper.entityToDto(tweet));
+		
+		// Create and set chain of replies leading to this tweet
+		List<TweetResponseDto> beforeTweets = new ArrayList<>();
+		Tweet currentTweet = tweet;
+		
+		while (currentTweet.getInReplyTo() != null) {
+			currentTweet = currentTweet.getInReplyTo();
+			
+			if (!currentTweet.isDeleted()) {
+				beforeTweets.add(tweetMapper.entityToDto(currentTweet));
+			}
+		}
+	
+		contextDto.setBefore(beforeTweets);
+		
+		// Create and set chain of replies following this tweet
+		// Each reply contains a list of replies
+		// Every time a reply is checked, its replies are added to a list to check for their replies
+		List<TweetResponseDto> afterTweets = new ArrayList<>();
+		List<Tweet> tweetsToCheckForReplyList = new ArrayList<>();
+		tweetsToCheckForReplyList.add(tweet);
+		
+		while (!tweetsToCheckForReplyList.isEmpty()) {
+			Tweet checkTweet = tweetsToCheckForReplyList.get(0);
+			
+			for (Tweet replyTweet : checkTweet.getReplyTweets()) {
+				if (!replyTweet.isDeleted()) {
+					afterTweets.add(tweetMapper.entityToDto(replyTweet));
+				}
+				tweetsToCheckForReplyList.add(replyTweet);
+			
+			}
+			tweetsToCheckForReplyList.remove(0);
+		}
+		
+		contextDto.setAfter(afterTweets);
+		
+		return contextDto;
 	}
 
 	// -------------------- POST METHODS --------------------
