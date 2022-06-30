@@ -61,34 +61,45 @@ public class UserServiceImpl implements UserService {
 			throw new NotFoundException("Specified user could not be found");
 		}
 
+		//retrieves list of all tweets by user
 		List<Tweet> tweets = optional.get().getTweets();
 
-		List<User> followers = optional.get().getFollowers();
+		//new list to contain non deleted tweets by user
+		List<Tweet> nonDeletedTweets = new ArrayList<>();
 
-		List<User> nonDeletedFollowers = new ArrayList<>();
-		for(User follower: followers) {
+		//adds all non deleted tweets to nonDeletedTweets
+		for(Tweet allTweets: tweets) {
+			if (!allTweets.isDeleted()) {
+				nonDeletedTweets.add(allTweets);
+			}
+		}
+		//retrieves all following
+		List<User> following = optional.get().getFollowing();
+		//sorts through following to find non deleted following and adds to list
+		List<User> nonDeletedFollowing = new ArrayList<>();
+		for(User follower: following) {
 			if(!follower.isDeleted()){
-				nonDeletedFollowers.add(follower);
+				nonDeletedFollowing.add(follower);
 			}
 		}
+		//adds tweets from everyone user is following to a list
+		List<Tweet> followingTweets = new ArrayList<>();
 
-		List<Tweet> followerTweets = new ArrayList<>();
+		for(User user: nonDeletedFollowing){
 
-		for(User user: nonDeletedFollowers){
-
-			followerTweets.addAll(user.getTweets());
+			followingTweets.addAll(user.getTweets());
 
 		}
+		//sorts through all tweets from following and adds all non-deleted tweets to new list
+		List<Tweet> undDeletedFollowingTweets = new ArrayList<>();
 
-		List<Tweet> unDeletedFollowerTweets = new ArrayList<>();
-
-		for(Tweet tweet: followerTweets){
+		for(Tweet tweet: followingTweets){
 			if(!tweet.isDeleted()) {
-				unDeletedFollowerTweets.add(tweet);
+				undDeletedFollowingTweets.add(tweet);
 			}
 		}
-		List<Tweet> feed = unDeletedFollowerTweets;
-		feed.addAll(tweets);
+		List<Tweet> feed = undDeletedFollowingTweets;
+		feed.addAll(nonDeletedTweets);
 
 		feed.sort(Comparator.comparing(Tweet::getPosted).reversed());
 
