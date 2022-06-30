@@ -73,7 +73,15 @@ public class TweetServiceImpl implements TweetService {
 
 	@Override
 	public TweetResponseDto getTweetById(Long id) {
-		return tweetMapper.entityToDto(tweetRepository.findByDeletedFalseAndId(id));
+		Optional<Tweet> optionalTweet = tweetRepository.findByDeletedFalseAndId(id);
+
+		if (optionalTweet.isEmpty()) {
+			throw new NotFoundException("No tweet found with id: " + id);
+		} else if (optionalTweet.get().isDeleted()) {
+			throw new NotFoundException("The tweet with id " + id + " has been deleted");
+		}
+
+		return tweetMapper.entityToDto(optionalTweet);
 	}
 
 	@Override
