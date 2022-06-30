@@ -28,7 +28,7 @@ public class Tweet {
 
 	@ManyToOne(targetEntity = User.class)
 	@JoinColumn(name = "authorTweets", nullable = false)
-	private Integer author;
+	private User author;
 	
 	@Column(nullable = false, updatable = false)
 	private Timestamp posted;
@@ -39,14 +39,14 @@ public class Tweet {
 	
 	@ManyToOne(targetEntity = Tweet.class)
 	@JoinColumn(name = "replyTweets")
-	private int inReplyTo;
+	private Tweet inReplyTo;
 	
 	@OneToMany(mappedBy = "inReplyTo")
 	private List<Tweet> replyTweets;
 	
 	@ManyToOne(targetEntity = Tweet.class)
 	@JoinColumn(name = "repostTweets")
-	private int repostOf;
+	private Tweet repostOf;
 	
 	@OneToMany(mappedBy = "repostOf")
 	private List<Tweet> repostTweets = new ArrayList<>();

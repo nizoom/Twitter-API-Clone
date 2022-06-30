@@ -1,7 +1,6 @@
 package com.cooksys.team3.services.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +31,7 @@ public class TweetServiceImpl implements TweetService {
 	private final UserMapper userMapper;
 	private final UserRepository userRepository;
 
+	// -------------------- HELPER METHODS --------------------
 	private Optional<User> validateUser(CredentialsDto credentialsDto) {
 
 		String username = credentialsDto.getUsername();
@@ -63,7 +63,7 @@ public class TweetServiceImpl implements TweetService {
 			throw new NotFoundException("No tweet found with id: " + tweetId);
 		}
 
-		if (!tweet.get().isDeleted()) {
+		if (tweet.get().isDeleted()) {
 			throw new NotFoundException("Tweet with id " + tweetId + " is deleted. Please enter a different tweet id");
 		}
 
@@ -71,6 +71,7 @@ public class TweetServiceImpl implements TweetService {
 
 	}
 
+	// -------------------- GET METHODS --------------------
 	@Override
 	public List<TweetResponseDto> getAllTweets() {
 		return tweetMapper.entitiesToDtos(tweetRepository.findAllByDeletedFalse());
@@ -78,18 +79,36 @@ public class TweetServiceImpl implements TweetService {
 
 	@Override
 	public TweetResponseDto getTweetById(Long id) {
-		Optional<Tweet> optionalTweet = validateTweet(id);
+		Tweet tweet = validateTweet(id).get();
 
-		return tweetMapper.entityToDto(optionalTweet);
+		return tweetMapper.entityToDto(tweet);
 	}
-	
+
 	@Override
 	public List<UserResponseDto> getUsersWhoLikedTweet(Long id) {
-		Optional<Tweet> optionalTweet = validateTweet(id);
-		
-		return userMapper.entityToDto(optionalTweet.get().getUserLikes());
+		Tweet tweet = validateTweet(id).get();
+
+		return userMapper.entityToDto(tweet.getUserLikes());
 	}
 
+	@Override
+	public List<TweetResponseDto> getReplies(Long tweetId) {
+
+		Optional<Tweet> validatedTweet = validateTweet(tweetId);
+
+		List<Tweet> replyChain = new ArrayList<>();
+
+		for (Tweet tweet : validatedTweet.get().getReplyTweets()) {
+			if (!tweet.isDeleted()) {
+				replyChain.add(tweet);
+			}
+		}
+
+		return tweetMapper.entitiesToDtos(replyChain);
+
+	}
+
+	// -------------------- POST METHODS --------------------
 	@Override
 	public void likeTweet(Long tweetId, UserRequestDto userRequestDto) {
 		Optional<User> validatedUser = validateUser(userRequestDto.getCredentialsDto());
@@ -102,24 +121,6 @@ public class TweetServiceImpl implements TweetService {
 
 		tweetRepository.saveAndFlush(validatedTweet.get());
 
-	}
-
-	@Override
-	public List<TweetResponseDto> getReplies(Long tweetId) {
-		
-		Optional<Tweet> validatedTweet = validateTweet(tweetId);
-		
-		List <Tweet> replyChain = new ArrayList<>();
-		
-		for (Tweet tweet : validatedTweet.get().getReplyTweets()) {
-			if(!tweet.isDeleted()) {
-				replyChain.add(tweet);
-			}
-		}
-		
-		return tweetMapper.entitiesToDtos(replyChain);
-		
-	
 	}
 
 }
