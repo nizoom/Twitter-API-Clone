@@ -67,6 +67,8 @@ public class UserServiceImpl implements UserService {
 			throw new NotFoundException("Specified user could not be found");
 		}
 		List<Tweet> tweets = tweetRepository.findByAuthor(optional.get());
+
+		tweets.sort(Comparator.comparing(Tweet::getPosted).reversed());
 		return tweetMapper.entitiesToDtos(tweets);
 	}
 
