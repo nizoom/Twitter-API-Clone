@@ -200,7 +200,7 @@ public class UserServiceImpl implements UserService {
 		validateUser(userRequestDto);
 		Optional<User> pathUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
 		Optional<User> credentialsUser = userRepository.findByDeletedFalseAndCredentialsUsername(userRequestDto.getCredentialsDto().getUsername());
-		if(pathUser.isEmpty()) {
+		if(pathUser.isEmpty() || credentialsUser.isEmpty()) {
 			throw new NotFoundException("Specified user could not be found");
 		}
 		User userWhoIsFollowing = credentialsUser.get();
@@ -240,5 +240,33 @@ public class UserServiceImpl implements UserService {
 		return userMapper.entityToDto(userToBeDeletedWithId);
 		
 
+	}
+
+	@Override
+	public void followUser(String username, UserRequestDto userRequestDto) {
+		validateUser(userRequestDto);
+		Optional<User> pathUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+		Optional<User> credentialsUser = userRepository.findByDeletedFalseAndCredentialsUsername(userRequestDto.getCredentialsDto().getUsername());
+		if(pathUser.isEmpty() || credentialsUser.isEmpty()) {
+			throw new NotFoundException("Specified user could not be found");
+		}
+		User userWhoWantsToFollow = credentialsUser.get();
+		User userToBeFollowed = pathUser.get();
+		
+		List<User> followedUsers = userWhoWantsToFollow.getFollowing();
+		List<User> followers = userToBeFollowed.getFollowers();
+		
+		if(followedUsers.contains(userToBeFollowed)) {
+			throw new BadRequestException("That user is already followed.");
+		}
+		else {
+			followedUsers.add(userToBeFollowed);
+			followers.add(userWhoWantsToFollow);
+		}
+		userToBeFollowed.setFollowers(followers);
+		userWhoWantsToFollow.setFollowing(followedUsers);
+		userRepository.saveAndFlush(userWhoWantsToFollow);
+		userRepository.saveAndFlush(userToBeFollowed);
+		
 	}
 }

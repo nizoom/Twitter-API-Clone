@@ -23,12 +23,11 @@ public interface UserService {
 
 	List<UserResponseDto> getFollowing(String username);
 
-
 	UserResponseDto getUser(String username);
-
 
 	void unfollowUser(String username, UserRequestDto userRequestDto);
 
-
 	UserResponseDto deleteUser(String username, UserRequestDto userRequestDto);
+
+	void followUser(String username, UserRequestDto userRequestDto);
 }
