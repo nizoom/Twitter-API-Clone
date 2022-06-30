@@ -1,5 +1,7 @@
 package com.cooksys.team3.services.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,14 +54,14 @@ public class TweetServiceImpl implements TweetService {
 			throw new BadRequestException("Please enter a tweet id");
 		}
 
-		Optional<Tweet> tweet = tweetRepository.findByDeletedFalseAndId(tweetId);
+		Optional<Tweet> tweet = tweetRepository.findById(tweetId);
 
-		if (tweet == null) {
-			throw new NotFoundException("Please enter a different tweet id");
+		if (tweet.isEmpty()) {
+			throw new NotFoundException("No tweet found with id: " + tweetId);
 		}
 
 		if (!tweet.get().isDeleted()) {
-			throw new NotFoundException("This tweet is deleted. Please enter a different tweet id");
+			throw new NotFoundException("Tweet with id " + tweetId + " is deleted. Please enter a different tweet id");
 		}
 
 		return tweet;
@@ -96,6 +98,25 @@ public class TweetServiceImpl implements TweetService {
 
 		tweetRepository.saveAndFlush(validatedTweet.get());
 
+	}
+
+	@Override
+	public List<TweetResponseDto> getReplies(Long tweetId) {
+		
+		Optional<Tweet> validatedTweet = validateTweet(tweetId);
+		
+		List <Tweet> replyChain = new ArrayList<>();
+		
+		for (Tweet tweet : validatedTweet.get().getReplyTweets()) {
+			if(!tweet.isDeleted()) {
+				replyChain.add(tweet);
+			}
+		}
+		
+		List<TweetResponseDto> replyChainToDto = tweetMapper.entitiesToDtos(replyChain);
+		
+		return replyChainToDto;
+			
 	}
 
 }

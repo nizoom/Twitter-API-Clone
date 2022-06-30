@@ -14,4 +14,6 @@ public interface TweetService {
 
 	void likeTweet(Long tweetId, UserRequestDto userRequestDto);
 
+	List<TweetResponseDto> getReplies(Long id);
+
 }
