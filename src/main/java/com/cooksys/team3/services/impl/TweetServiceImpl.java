@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
 import com.cooksys.team3.dtos.UserRequestDto;
+import com.cooksys.team3.dtos.UserResponseDto;
 import com.cooksys.team3.entities.Tweet;
 import com.cooksys.team3.entities.User;
 import com.cooksys.team3.exceptions.BadRequestException;
 import com.cooksys.team3.exceptions.NotFoundException;
 import com.cooksys.team3.mappers.TweetMapper;
+import com.cooksys.team3.mappers.UserMapper;
 import com.cooksys.team3.repositories.TweetRepository;
 import com.cooksys.team3.repositories.UserRepository;
 import com.cooksys.team3.services.TweetService;
@@ -27,6 +29,7 @@ public class TweetServiceImpl implements TweetService {
 
 	private final TweetMapper tweetMapper;
 	private final TweetRepository tweetRepository;
+	private final UserMapper userMapper;
 	private final UserRepository userRepository;
 
 	private Optional<User> validateUser(CredentialsDto credentialsDto) {
@@ -75,15 +78,16 @@ public class TweetServiceImpl implements TweetService {
 
 	@Override
 	public TweetResponseDto getTweetById(Long id) {
-		Optional<Tweet> optionalTweet = tweetRepository.findByDeletedFalseAndId(id);
-
-		if (optionalTweet.isEmpty()) {
-			throw new NotFoundException("No tweet found with id: " + id);
-		} else if (optionalTweet.get().isDeleted()) {
-			throw new NotFoundException("The tweet with id " + id + " has been deleted");
-		}
+		Optional<Tweet> optionalTweet = validateTweet(id);
 
 		return tweetMapper.entityToDto(optionalTweet);
+	}
+	
+	@Override
+	public List<UserResponseDto> getUsersWhoLikedTweet(Long id) {
+		Optional<Tweet> optionalTweet = validateTweet(id);
+		
+		return userMapper.entityToDto(optionalTweet.get().getUserLikes());
 	}
 
 	@Override
