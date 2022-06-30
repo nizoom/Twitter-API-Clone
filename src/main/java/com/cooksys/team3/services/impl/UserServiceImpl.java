@@ -233,8 +233,16 @@ public class UserServiceImpl implements UserService {
 		
 		Optional<User> userToBeDeleted = userRepository.findByDeletedFalseAndCredentialsUsername(username);
 		
-		userRepository.deleteById(userToBeDeleted.get().getId());
+//		change all tweets to be deleted as well 
 		
+		List <Tweet> tweetsToBeDeleted = userToBeDeleted.get().getTweets();
+		for(Tweet tweet : tweetsToBeDeleted) {
+			tweet.setDeleted(true);
+		}
+		
+		tweetRepository.saveAllAndFlush(tweetsToBeDeleted);
+		
+		userToBeDeleted.get().setDeleted(true);
 		User userToBeDeletedWithId = userRepository.saveAndFlush(userToBeDeleted.get());
 		
 		return userMapper.entityToDto(userToBeDeletedWithId);
