@@ -56,7 +56,46 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<TweetResponseDto> getFeed(String username) {
-		return null;
+		Optional<User> optional = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+		if (optional.isEmpty()) {
+			throw new NotFoundException("Specified user could not be found");
+		}
+
+		List<Tweet> tweets = optional.get().getTweets();
+
+		List<User> followers = optional.get().getFollowers();
+
+		List<User> nonDeletedFollowers = new ArrayList<>();
+		for(User follower: followers) {
+			if(!follower.isDeleted()){
+				nonDeletedFollowers.add(follower);
+			}
+		}
+
+		List<Tweet> followerTweets = new ArrayList<>();
+
+		for(User user: nonDeletedFollowers){
+
+			followerTweets.addAll(user.getTweets());
+
+		}
+
+		List<Tweet> unDeletedFollowerTweets = new ArrayList<>();
+
+		for(Tweet tweet: followerTweets){
+			if(!tweet.isDeleted()) {
+				unDeletedFollowerTweets.add(tweet);
+			}
+		}
+		List<Tweet> feed = unDeletedFollowerTweets;
+		feed.addAll(tweets);
+
+		feed.sort(Comparator.comparing(Tweet::getPosted).reversed());
+
+		return tweetMapper.entitiesToDtos(feed);
+
+
+
 	}
 
 	@Override
@@ -66,10 +105,15 @@ public class UserServiceImpl implements UserService {
 		if (optional.isEmpty()) {
 			throw new NotFoundException("Specified user could not be found");
 		}
-		List<Tweet> tweets = tweetRepository.findByAuthor(optional.get());
-
-		tweets.sort(Comparator.comparing(Tweet::getPosted).reversed());
-		return tweetMapper.entitiesToDtos(tweets);
+		List<Tweet> tweets = optional.get().getTweets();
+		List<Tweet> nonDeletedTweets = new ArrayList<>();
+		for(Tweet tweet: tweets){
+			if(!tweet.isDeleted()){
+				nonDeletedTweets.add(tweet);
+			}
+		}
+		nonDeletedTweets.sort(Comparator.comparing(Tweet::getPosted).reversed());
+		return tweetMapper.entitiesToDtos(nonDeletedTweets);
 	}
 
 	@Override
