@@ -124,4 +124,30 @@ public class UserServiceImpl implements UserService {
 		}
 		return userMapper.entityToDto(requestedUser.get());
 	}
+
+	@Override
+	public void unfollowUser(String username, UserRequestDto userRequestDto) {
+		validateUser(userRequestDto);
+		Optional<User> pathUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+		Optional<User> credentialsUser = userRepository.findByDeletedFalseAndCredentialsUsername(userRequestDto.getCredentialsDto().getUsername());
+		if(pathUser.isEmpty()) {
+			throw new NotFoundException("Specified user could not be found");
+		}
+		User userWhoIsFollowing = credentialsUser.get();
+		User userToBeUnfollowed = pathUser.get();
+		
+		List<User> followedUsers = userWhoIsFollowing.getFollowing();
+		List<User> followers = userToBeUnfollowed.getFollowers();
+		if(followedUsers.contains(userToBeUnfollowed)) {
+			followedUsers.remove(userToBeUnfollowed);
+			followers.remove(userWhoIsFollowing);
+		}
+		else {
+			throw new NotFoundException("No following relationship exists between users");
+		}
+		userToBeUnfollowed.setFollowers(followers);
+		userWhoIsFollowing.setFollowing(followedUsers);
+		userRepository.saveAndFlush(userWhoIsFollowing);
+		userRepository.saveAndFlush(userToBeUnfollowed);
+	}
 }
