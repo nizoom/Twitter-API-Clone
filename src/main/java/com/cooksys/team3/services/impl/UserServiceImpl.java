@@ -220,4 +220,25 @@ public class UserServiceImpl implements UserService {
 		userRepository.saveAndFlush(userWhoIsFollowing);
 		userRepository.saveAndFlush(userToBeUnfollowed);
 	}
+	
+
+	@Override
+	public UserResponseDto deleteUser(String username, UserRequestDto userRequestDto) {
+	
+		validateUser(userRequestDto);
+		
+		if(!userRepository.existsByCredentialsUsername(username)) {
+			throw new NotFoundException("Specified user could not be found");
+		}
+		
+		Optional<User> userToBeDeleted = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+		
+		userRepository.deleteById(userToBeDeleted.get().getId());
+		
+		User userToBeDeletedWithId = userRepository.saveAndFlush(userToBeDeleted.get());
+		
+		return userMapper.entityToDto(userToBeDeletedWithId);
+		
+
+	}
 }

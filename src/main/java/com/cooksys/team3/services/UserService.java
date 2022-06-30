@@ -28,4 +28,7 @@ public interface UserService {
 
 
 	void unfollowUser(String username, UserRequestDto userRequestDto);
+
+
+	UserResponseDto deleteUser(String username, UserRequestDto userRequestDto);
 }

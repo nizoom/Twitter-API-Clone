@@ -69,4 +69,13 @@ public class UserController {
 		userService.unfollowUser(username, userRequestDto);
 	}
 	
+	
+	@DeleteMapping("/@{username}")
+	
+	public UserResponseDto deleteUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
+		
+		return userService.deleteUser(username, userRequestDto);
+	}
+	
+	
 }
