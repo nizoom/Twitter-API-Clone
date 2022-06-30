@@ -32,17 +32,17 @@ public class TweetServiceImpl implements TweetService {
 		String username = credentialsDto.getUsername();
 
 		String pw = credentialsDto.getPassword();
-		
-		Optional <User> matchingUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
-		
-		if(matchingUser == null) {
+
+		Optional<User> matchingUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+
+		if (matchingUser == null) {
 			throw new NotFoundException("Specified user could not be found");
 		}
-		
-		if(matchingUser.get().getCredentials().getPassword() != pw) {
+
+		if (matchingUser.get().getCredentials().getPassword() != pw) {
 			throw new NotFoundException("Password does not match this username");
 		}
-		
+
 		return matchingUser;
 
 	}
@@ -53,11 +53,11 @@ public class TweetServiceImpl implements TweetService {
 		}
 
 		Optional<Tweet> tweet = tweetRepository.findByDeletedFalseAndId(tweetId);
-		
+
 		if (tweet == null) {
 			throw new NotFoundException("Please enter a different tweet id");
 		}
-		
+
 		if (!tweet.get().isDeleted()) {
 			throw new NotFoundException("This tweet is deleted. Please enter a different tweet id");
 		}
@@ -72,8 +72,12 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
-	public void likeTweet(Long tweetId, UserRequestDto userRequestDto) {
+	public TweetResponseDto getTweetById(Long id) {
+		return tweetMapper.entityToDto(tweetRepository.findByDeletedFalseAndId(id));
+	}
 
+	@Override
+	public void likeTweet(Long tweetId, UserRequestDto userRequestDto) {
 		Optional<User> validatedUser = validateUser(userRequestDto.getCredentialsDto());
 
 		Optional<Tweet> validatedTweet = validateTweet(tweetId);
