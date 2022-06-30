@@ -90,15 +90,9 @@ public class TweetServiceImpl implements TweetService {
 
 		Optional<Tweet> validatedTweet = validateTweet(tweetId);
 
-		List<Tweet> userLikes = validatedUser.get().getLikes();
-
-		userLikes.add(validatedTweet.get());
-
 		List<User> usersWhoLikeThisTweet = validatedTweet.get().getUserLikes();
 
 		usersWhoLikeThisTweet.add(validatedUser.get());
-
-		userRepository.saveAndFlush(validatedUser.get());
 
 		tweetRepository.saveAndFlush(validatedTweet.get());
 
