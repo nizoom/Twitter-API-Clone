@@ -277,4 +277,16 @@ public class UserServiceImpl implements UserService {
 		userRepository.saveAndFlush(userToBeFollowed);
 		
 	}
+
+	@Override
+	public UserResponseDto createUser(UserRequestDto userRequestDto) {
+		//ensure required profile and credentials fields are entered 
+		
+		//check if credentials match already existing but deleted user
+		
+		//if so restore user and restore tweets 
+		
+		//else add user to repository	
+		return null;
+	}
 }
