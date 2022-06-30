@@ -12,4 +12,6 @@ import java.util.List;
 public interface TweetRepository extends JpaRepository <Tweet, Long> {
 
     List<Tweet> findByAuthor(User user);
+
+	List<Tweet> findAllByDeletedFalse();
 }
