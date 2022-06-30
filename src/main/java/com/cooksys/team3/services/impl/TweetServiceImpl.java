@@ -117,10 +117,9 @@ public class TweetServiceImpl implements TweetService {
 			}
 		}
 		
-		List<TweetResponseDto> replyChainToDto = tweetMapper.entitiesToDtos(replyChain);
+		return tweetMapper.entitiesToDtos(replyChain);
 		
-		return replyChainToDto;
-			
+	
 	}
 
 }
