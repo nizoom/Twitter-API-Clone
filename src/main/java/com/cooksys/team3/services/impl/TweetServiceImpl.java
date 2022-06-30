@@ -107,6 +107,20 @@ public class TweetServiceImpl implements TweetService {
 		return tweetMapper.entitiesToDtos(replyChain);
 
 	}
+	
+	@Override
+	public List<TweetResponseDto> getReposts(Long id) {
+		List<Tweet> allRepostTweets = validateTweet(id).get().getRepostTweets();
+		List<Tweet> nonDeletedRepostTweets = new ArrayList<>();
+
+		for (Tweet tweet : allRepostTweets) {
+			if (!tweet.isDeleted()) {
+				nonDeletedRepostTweets.add(tweet);
+			}
+		}
+		
+		return tweetMapper.entitiesToDtos(nonDeletedRepostTweets);
+	}
 
 	// -------------------- POST METHODS --------------------
 	@Override
