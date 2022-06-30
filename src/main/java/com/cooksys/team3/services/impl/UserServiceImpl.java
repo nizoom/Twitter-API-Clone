@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<TweetResponseDto> getTweets(String username) {
-		Optional<User> optional = userRepository.findByCredentialsUsername(username);
+		Optional<User> optional = userRepository.findByDeletedFalseAndCredentialsUsername(username);
 
 		if (optional.isEmpty()) {
 			throw new NotFoundException("Specified user could not be found");
@@ -72,7 +72,20 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserResponseDto> getFollowers(String username) {
-		return null;
+		Optional<User> optional = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+
+		if (optional.isEmpty()) {
+			throw new NotFoundException("Specified user could not be found");
+		}
+		List<User> followers = optional.get().getFollowers();
+		List<User> nonDeletedFollowers = new ArrayList<>();
+			for(User follower: followers) {
+				if(!follower.isDeleted()){
+					nonDeletedFollowers.add(follower);
+				}
+			}
+			return userMapper.entityToDto(nonDeletedFollowers);
+
 	}
 
 	@Override
