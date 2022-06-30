@@ -20,4 +20,6 @@ public interface TweetService {
 
 	void likeTweet(Long tweetId, UserRequestDto userRequestDto);
 
+	TweetResponseDto repostTweet(Long id, UserRequestDto userRequestDto);
+
 }

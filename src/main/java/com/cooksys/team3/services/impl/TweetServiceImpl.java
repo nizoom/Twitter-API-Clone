@@ -1,5 +1,6 @@
 package com.cooksys.team3.services.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -135,6 +136,22 @@ public class TweetServiceImpl implements TweetService {
 
 		tweetRepository.saveAndFlush(validatedTweet.get());
 
+	}
+
+	@Override
+	public TweetResponseDto repostTweet(Long id, UserRequestDto userRequestDto) {
+		Optional<User> validatedUser = validateUser(userRequestDto.getCredentialsDto());
+		
+		Optional<Tweet> validatedTweet = validateTweet(id);
+		
+		Tweet tweet = validatedTweet.get();
+		
+		tweet.setContent(null);
+		tweet.setRepostOf(tweet);
+		tweet.setAuthor(validatedUser.get());
+		tweet.setPosted(new Timestamp(System.currentTimeMillis()));
+		
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
 	}
 
 }
