@@ -77,7 +77,7 @@ public class UserController {
 		return userService.deleteUser(username, userRequestDto);
 	}
 	
-	@PostMapping("/@{username}/unfollow")
+	@PostMapping("/@{username}/follow")
 	
 	public void followUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
 		userService.followUser(username, userRequestDto);
