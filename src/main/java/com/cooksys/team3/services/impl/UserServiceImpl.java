@@ -200,7 +200,7 @@ public class UserServiceImpl implements UserService {
 		validateUser(userRequestDto);
 		Optional<User> pathUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
 		Optional<User> credentialsUser = userRepository.findByDeletedFalseAndCredentialsUsername(userRequestDto.getCredentialsDto().getUsername());
-		if(pathUser.isEmpty()) {
+		if(pathUser.isEmpty() || credentialsUser.isEmpty()) {
 			throw new NotFoundException("Specified user could not be found");
 		}
 		User userWhoIsFollowing = credentialsUser.get();
@@ -233,12 +233,60 @@ public class UserServiceImpl implements UserService {
 		
 		Optional<User> userToBeDeleted = userRepository.findByDeletedFalseAndCredentialsUsername(username);
 		
-		userRepository.deleteById(userToBeDeleted.get().getId());
+//		change all tweets to be deleted as well 
 		
+		List <Tweet> tweetsToBeDeleted = userToBeDeleted.get().getTweets();
+		for(Tweet tweet : tweetsToBeDeleted) {
+			tweet.setDeleted(true);
+		}
+		
+		tweetRepository.saveAllAndFlush(tweetsToBeDeleted);
+		
+		userToBeDeleted.get().setDeleted(true);
 		User userToBeDeletedWithId = userRepository.saveAndFlush(userToBeDeleted.get());
 		
 		return userMapper.entityToDto(userToBeDeletedWithId);
 		
 
+	}
+
+	@Override
+	public void followUser(String username, UserRequestDto userRequestDto) {
+		validateUser(userRequestDto);
+		Optional<User> pathUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+		Optional<User> credentialsUser = userRepository.findByDeletedFalseAndCredentialsUsername(userRequestDto.getCredentialsDto().getUsername());
+		if(pathUser.isEmpty() || credentialsUser.isEmpty()) {
+			throw new NotFoundException("Specified user could not be found");
+		}
+		User userWhoWantsToFollow = credentialsUser.get();
+		User userToBeFollowed = pathUser.get();
+		
+		List<User> followedUsers = userWhoWantsToFollow.getFollowing();
+		List<User> followers = userToBeFollowed.getFollowers();
+		
+		if(followedUsers.contains(userToBeFollowed)) {
+			throw new BadRequestException("That user is already followed.");
+		}
+		else {
+			followedUsers.add(userToBeFollowed);
+			followers.add(userWhoWantsToFollow);
+		}
+		userToBeFollowed.setFollowers(followers);
+		userWhoWantsToFollow.setFollowing(followedUsers);
+		userRepository.saveAndFlush(userWhoWantsToFollow);
+		userRepository.saveAndFlush(userToBeFollowed);
+		
+	}
+
+	@Override
+	public UserResponseDto createUser(UserRequestDto userRequestDto) {
+		//ensure required profile and credentials fields are entered 
+		
+		//check if credentials match already existing but deleted user
+		
+		//if so restore user and restore tweets 
+		
+		//else add user to repository	
+		return null;
 	}
 }
