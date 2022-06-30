@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
+import com.cooksys.team3.dtos.UserRequestDto;
 
 public interface TweetService {
 
 	List<TweetResponseDto> getAllTweets();
 
-	void likeTweet(Long tweetId, CredentialsDto credentialsDto);
+	void likeTweet(Long tweetId, UserRequestDto userRequestDto);
 
 }

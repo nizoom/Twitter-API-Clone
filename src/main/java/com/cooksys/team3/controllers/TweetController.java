@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
+import com.cooksys.team3.dtos.UserRequestDto;
 import com.cooksys.team3.services.TweetService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,8 @@ public class TweetController {
 	}
 
 	@PostMapping("id/{id}/like")
-	public void likeTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
-		tweetService.likeTweet(id, credentialsDto);
+	public void likeTweet(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto) {
+		tweetService.likeTweet(id, 	userRequestDto);
 	}
 
 }

@@ -1,11 +1,13 @@
 package com.cooksys.team3.services.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
+import com.cooksys.team3.dtos.UserRequestDto;
 import com.cooksys.team3.entities.Tweet;
 import com.cooksys.team3.entities.User;
 import com.cooksys.team3.exceptions.BadRequestException;
@@ -25,56 +27,38 @@ public class TweetServiceImpl implements TweetService {
 	private final TweetRepository tweetRepository;
 	private final UserRepository userRepository;
 
-	private User validateUser(CredentialsDto credentialsDto) {
+	private Optional<User> validateUser(CredentialsDto credentialsDto) {
 
 		String username = credentialsDto.getUsername();
 
 		String pw = credentialsDto.getPassword();
-
-		List<User> allActiveUsers = userRepository.findAllByDeletedFalse();
-
-		boolean usernameExists = false;
-
-		for (User user : allActiveUsers) {
-
-			// compare username from dto to every stored username
-
-			if (username == user.getCredentials().getUsername()) {
-
-				usernameExists = true;
-
-				// then compare password attempt
-
-				if (pw == user.getCredentials().getPassword()) {
-					// password and username match then
-					return user;
-				}
-			}
+		
+		Optional <User> matchingUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
+		
+		if(matchingUser == null) {
+			throw new NotFoundException("Specified user could not be found");
 		}
-
-		if (usernameExists) {
-//			found username but passwords don't match
+		
+		if(matchingUser.get().getCredentials().getPassword() != pw) {
 			throw new NotFoundException("Password does not match this username");
-
-		} else {
-//				username not found
-			throw new NotFoundException("Username does not match any account");
-
 		}
+		
+		return matchingUser;
 
 	}
 
-	private Tweet validateTweet(Long tweetId) {
+	private Optional<Tweet> validateTweet(Long tweetId) {
 		if (tweetId == null) {
 			throw new BadRequestException("Please enter a tweet id");
 		}
 
-		if (!tweetRepository.existsById(tweetId)) {
+		Optional<Tweet> tweet = tweetRepository.findByDeletedFalseAndId(tweetId);
+		
+		if (tweet == null) {
 			throw new NotFoundException("Please enter a different tweet id");
 		}
-
-		Tweet tweet = tweetRepository.getById(tweetId);
-		if (!tweet.isDeleted()) {
+		
+		if (!tweet.get().isDeleted()) {
 			throw new NotFoundException("This tweet is deleted. Please enter a different tweet id");
 		}
 
@@ -88,27 +72,23 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
-	public void likeTweet(Long tweetId, CredentialsDto credentialsDto) {
+	public void likeTweet(Long tweetId, UserRequestDto userRequestDto) {
 
-		User validatedUser = validateUser(credentialsDto);
+		Optional<User> validatedUser = validateUser(userRequestDto.getCredentialsDto());
 
-		Tweet validatedTweet = validateTweet(tweetId);
+		Optional<Tweet> validatedTweet = validateTweet(tweetId);
 
-		List<Tweet> userLikes = validatedUser.getLikes();
+		List<Tweet> userLikes = validatedUser.get().getLikes();
 
-		userLikes.add(validatedTweet);
+		userLikes.add(validatedTweet.get());
 
-		List<User> usersWhoLikeThisTweet = validatedTweet.getUserLikes();
+		List<User> usersWhoLikeThisTweet = validatedTweet.get().getUserLikes();
 
-		usersWhoLikeThisTweet.add(validatedUser);
+		usersWhoLikeThisTweet.add(validatedUser.get());
 
-//		I don't think these need to be saved because this endpoint doesn't return anyDto 
+		userRepository.saveAndFlush(validatedUser.get());
 
-//		However userRepository.flush() doesn't take any arguments to specify what should be flushed
-
-		userRepository.saveAndFlush(validatedUser);
-
-		tweetRepository.saveAndFlush(validatedTweet);
+		tweetRepository.saveAndFlush(validatedTweet.get());
 
 	}
 
