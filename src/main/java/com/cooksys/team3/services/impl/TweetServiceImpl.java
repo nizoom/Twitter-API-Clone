@@ -1,11 +1,15 @@
 package com.cooksys.team3.services.impl;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.cooksys.team3.dtos.*;
+import com.cooksys.team3.repositories.HashtagRepository;
 import org.springframework.stereotype.Service;
 
 import com.cooksys.team3.dtos.ContextDto;
@@ -37,6 +41,8 @@ public class TweetServiceImpl implements TweetService {
 	private final UserMapper userMapper;
 	private final UserRepository userRepository;
 	private final HashtagMapper hashtagMapper;
+
+	private final HashtagRepository hashtagRepository;
 
 	// -------------------- HELPER METHODS --------------------
 	private Optional<User> validateUser(CredentialsDto credentialsDto) {
@@ -237,6 +243,90 @@ public class TweetServiceImpl implements TweetService {
 	
 		List <Hashtag> allHashtags = validatedTweet.get().getHashtags();
 		return hashtagMapper.entitiesToDtos(allHashtags);
+	}
+
+	@Override
+	public TweetResponseDto replyTweet(Long id, TweetRequestDto tweetRequestDto) {
+
+
+		validateTweet(id);
+		validateUser(tweetRequestDto.getCredentialsDto());
+		User author = validateUser(tweetRequestDto.getCredentialsDto()).get();
+		Tweet tweetReply = validateTweet(id).get();
+
+		// throws an error if the reply is empty
+		if(tweetRequestDto.getContent() == null){
+			throw new BadRequestException("Reply must contain a tweet");
+		}
+		//set content and author
+		Tweet tweet = new Tweet();
+		tweet.setContent(tweetRequestDto.getContent());
+		tweet.setAuthor(author);
+
+		//parse for mentioned
+		String text = tweetRequestDto.getContent();
+		String patternst = "@[a-zA-Z0-9]*";
+		Pattern pattern = Pattern.compile(patternst);
+		Matcher matcher = pattern.matcher(text);
+		while (matcher.find()) {
+			String mentionedUser = matcher.group(1);
+			//removes @ symbol
+			mentionedUser.replace("@", "");
+			//searches repository for matching user
+			Optional<User> optUser = userRepository.findByCredentialsUsername(mentionedUser);
+			if (!optUser.isEmpty()) {
+				//if matching user is found add to mentions
+				User mentionedUserObj = optUser.get();
+				tweet.getUserMentions().add(mentionedUserObj);
+			}
+		}
+
+		//parse for hashtag
+
+			String hashtext = tweetRequestDto.getContent();
+			//pattern to look for
+			String patternString = "#[a-zA-Z0-9]*";
+
+			Pattern compilePattern = Pattern.compile(patternString);
+			Matcher secondMatcher = compilePattern.matcher(hashtext);
+
+			Hashtag hashTag = new Hashtag();
+			while(matcher.find()){
+				String usedTag = secondMatcher.group(1);
+				usedTag.replace("#", "");
+				Optional<Hashtag> optionalHashtag = hashtagRepository.findAllByLabel(usedTag);
+
+				//checks if hashtag exists and updates last used
+				if(!optionalHashtag.isEmpty()){
+					hashTag = optionalHashtag.get();
+					hashTag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
+
+				}
+				//creates new hashtag if it doesn't exist
+				else {
+					hashTag.setLabel(usedTag);
+					hashTag.setFirstUsed(Timestamp.valueOf(LocalDateTime.now()));
+					hashTag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
+					hashtagRepository.saveAndFlush(hashTag);
+				}
+				//sets hashtags for tweet
+				tweet.getHashtags().add(hashTag);
+
+			}
+
+			Tweet saveTweet = tweetRepository.save(tweet);
+			//adds this new tweet to replies of original tweet
+			tweetReply.getReplyTweets().add(saveTweet);
+			//sets in reply to
+			saveTweet.setInReplyTo(validateTweet(id).get());
+
+
+
+		return tweetMapper.entityToDto(saveTweet);
+
+
+
+
 	}
 
 }

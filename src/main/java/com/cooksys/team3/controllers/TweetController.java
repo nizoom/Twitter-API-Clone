@@ -80,7 +80,7 @@ public class TweetController {
 	@PostMapping("/{id}/reply")
 
 	public TweetResponseDto replyTweet(@PathVariable Long id, @RequestBody TweetRequestDto tweetRequestDto) {
-		return null;
+		return tweetService.replyTweet(id, tweetRequestDto);
 	}
 
 }
