@@ -23,15 +23,15 @@ public class Team3ControllerAdvice {
 		return new ErrorDto(notFoundException.getMessage());
 	}
 	
-//	@ResponseStatus(HttpStatus.UNAUTHORIZED)
-//	@ExceptionHandler(NotFoundException.class)
-//	public ErrorDto handleNotAuthorizedException(HttpServletRequest request, NotAuthorizedException notAuthorizedException) {
-//		return new ErrorDto(notAuthorizedException.getMessage());
-//	}
-//	
-//	@ResponseStatus(HttpStatus.BAD_REQUEST)
-//	@ExceptionHandler(BadRequestException.class)
-//	public ErrorDto handleBadRequestException(HttpServletRequest request, BadRequestException badRequestException) {
-//		return new ErrorDto(badRequestException.getMessage());
-//	}
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@ExceptionHandler(NotAuthorizedException.class)
+	public ErrorDto handleNotAuthorizedException(HttpServletRequest request, NotAuthorizedException notAuthorizedException) {
+		return new ErrorDto(notAuthorizedException.getMessage());
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(BadRequestException.class)
+	public ErrorDto handleBadRequestException(HttpServletRequest request, BadRequestException badRequestException) {
+		return new ErrorDto(badRequestException.getMessage());
+	}
 }
