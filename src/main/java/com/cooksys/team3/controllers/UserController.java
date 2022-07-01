@@ -17,78 +17,69 @@ import org.springframework.http.HttpStatus;
 public class UserController {
 	private final UserService userService;
 
+	// -------------------- GET METHODS --------------------
 	@GetMapping
 	public List<UserResponseDto> getUsers() {
 		return userService.getUsers();
 	}
+	
+	@GetMapping("/@{username}")
+	public UserResponseDto getUser(@PathVariable String username) {
+		return userService.getUser(username);
+	}
 
 	@GetMapping("/@{username}/followers")
-
 	public List<UserResponseDto> getFollowers(@PathVariable String username) {
 		return userService.getFollowers(username);
 	}
 
 	@GetMapping("/@{username}/tweets")
-
 	public List<TweetResponseDto> getTweets(@PathVariable String username) {
 		return userService.getTweets(username);
 	}
 
 	@GetMapping("/@{username}/feed")
-
 	public List<TweetResponseDto> getFeed(@PathVariable String username) {
 		return userService.getFeed(username);
 	}
-
-	@PatchMapping("/@{username}")
-
-	public UserResponseDto updateUsername(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
-		return userService.updateUsername(username, userRequestDto);
-	}
-
-	@GetMapping("/@{username}/mentions")
 	
+	@GetMapping("/@{username}/mentions")
 	public List<TweetResponseDto> getMentions(@PathVariable String username) {
 		return userService.getMentions(username);
 	}
 	
 	@GetMapping("/@{username}/following")
-	
 	public List<UserResponseDto> getFollowing(@PathVariable String username) {
 		return userService.getFollowing(username);
 	}
-	
-	@GetMapping("/@{username}")
-	
-	public UserResponseDto getUser(@PathVariable String username) {
-		return userService.getUser(username);
-	}
 
-	@PostMapping("/@{username}/unfollow")
-	
-	public void unfollowUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
-		userService.unfollowUser(username, userRequestDto);
-	}
-	
-	
-	@DeleteMapping("/@{username}")
-	
-	public UserResponseDto deleteUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
-		
-		return userService.deleteUser(username, userRequestDto);
-	}
-	
-	@PostMapping("/@{username}/follow")
-	
-	public void followUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
-		userService.followUser(username, userRequestDto);
-	}
-	
+	// -------------------- POST METHODS --------------------
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public UserResponseDto createUser(@RequestBody UserRequestDto userRequestDto) {
 		return userService.createUser(userRequestDto);
-		
+	}
+	
+	@PostMapping("/@{username}/follow")
+	public void followUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
+		userService.followUser(username, userRequestDto);
+	}
+	
+	@PostMapping("/@{username}/unfollow")
+	public void unfollowUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
+		userService.unfollowUser(username, userRequestDto);
+	}
+	
+	// -------------------- UPDATE METHODS --------------------
+	@PatchMapping("/@{username}")
+	public UserResponseDto updateUsername(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
+		return userService.updateUsername(username, userRequestDto);
+	}
+
+	// -------------------- DELETE METHODS --------------------
+	@DeleteMapping("/@{username}")
+	public UserResponseDto deleteUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
+		return userService.deleteUser(username, userRequestDto);
 	}
 	
 }
