@@ -197,7 +197,8 @@ public class UserServiceImpl implements UserService {
 	public UserResponseDto createUser(UserRequestDto userRequestDto) {
 		// ensure required profile and credentials fields are entered
 		validateUser(userRequestDto);
-		if (userRequestDto.getProfile().getEmail().isEmpty()) {
+		
+		if (userRequestDto.getProfile().getEmail() == null) {
 			throw new BadRequestException("Please enter an email address");
 		}
 		
