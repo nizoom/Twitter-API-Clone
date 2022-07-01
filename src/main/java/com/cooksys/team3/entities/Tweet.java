@@ -53,7 +53,7 @@ public class Tweet {
 	
 	@ManyToMany
 	@JoinTable
-	private List<Hashtag> hashtags;
+	private List<Hashtag> hashtags = new ArrayList<>();
 	
 	// There are two ManyToMany relationships between Tweet and User: user_likes and user_mentions
 	@ManyToMany

@@ -45,6 +45,16 @@ public class TweetServiceImpl implements TweetService {
 
 	// -------------------- HELPER METHODS --------------------
 	private Optional<User> validateUser(CredentialsDto credentialsDto) {
+		if(credentialsDto == null) {
+			throw new BadRequestException("Please enter a username and password");
+		}
+		
+		if(credentialsDto.getUsername() == null) {
+			throw new BadRequestException("Please enter a username.");
+		}
+		if(credentialsDto.getPassword() == null) {
+			throw new BadRequestException("Please enter a password.");
+		}
 
 		String username = credentialsDto.getUsername();
 
@@ -56,7 +66,7 @@ public class TweetServiceImpl implements TweetService {
 			throw new NotFoundException("Specified user could not be found");
 		}
 
-		if (matchingUser.get().getCredentials().getPassword() != pw) {
+		if (!matchingUser.get().getCredentials().getPassword().equals(pw)) {
 			throw new NotFoundException("Password does not match this username");
 		}
 
@@ -84,54 +94,43 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	private void parseContentForUsernameAndAddToUserMentions(Tweet tweet, String content) {
-		String patternst = "@[a-zA-Z0-9]*";
-		Pattern pattern = Pattern.compile(patternst);
-		Matcher matcher = pattern.matcher(content);
-		while (matcher.find()) {
-			String mentionedUser = matcher.group(1);
-			// removes @ symbol
-			mentionedUser.replace("@", "");
-			// searches repository for matching user
-			Optional<User> optUser = userRepository.findByCredentialsUsername(mentionedUser);
-			if (!optUser.isEmpty()) {
-				// if matching user is found add to mentions
-				User mentionedUserObj = optUser.get();
-				tweet.getUserMentions().add(mentionedUserObj);
+		String[] words = content.split(" ");
+		for(String word : words) {
+			if(word.startsWith("@")) {
+				word.replace("@", "");
+				Optional<User> optUser = userRepository.findByCredentialsUsername(word);
+				if(optUser.isPresent()) {
+					User mentionedUserobj = optUser.get();
+					tweet.getUserMentions().add(mentionedUserobj);
+				}
 			}
 		}
 	}
 	
 	private void parseContentForHashtagAndAddToTweetHashtags(Tweet tweet, String content) {
-		// pattern to look for
-		String patternString = "#[a-zA-Z0-9]*";
-
-		Pattern pattern = Pattern.compile(patternString);
-		Matcher secondMatcher = pattern.matcher(content);
-		Hashtag hashTag = new Hashtag();
-		Matcher matcher = pattern.matcher(content);
-		while (matcher.find()) {
-			String usedTag = secondMatcher.group(1);
-			usedTag.replace("#", "");
-			Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel(usedTag);
-
-			// checks if hashtag exists and updates last used
-			if (!optionalHashtag.isEmpty()) {
-				hashTag = optionalHashtag.get();
-				hashTag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
-
+		String[] words = content.split(" ");
+		for(String word : words) {
+			if(word.startsWith("#")) {
+				word.replace("#", "");
+				Optional<Hashtag> optHashtag = hashtagRepository.findByLabel(word);
+				if(optHashtag.isPresent()) {
+					Hashtag hashtag = optHashtag.get();
+					hashtag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
+					tweet.getHashtags().add(hashtag);
+				}
+				else {
+					Hashtag hashtag = new Hashtag();
+					hashtag.setLabel(word);
+					hashtag.setFirstUsed(Timestamp.valueOf(LocalDateTime.now()));
+					hashtag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
+					tweet.getHashtags().add(hashtag);
+					hashtagRepository.saveAndFlush(hashtag);
+					
+				}
 			}
-			// creates new hashtag if it doesn't exist
-			else {
-				hashTag.setLabel(usedTag);
-				hashTag.setFirstUsed(Timestamp.valueOf(LocalDateTime.now()));
-				hashTag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
-				hashtagRepository.saveAndFlush(hashTag);
-			}
-			// sets hashtags for tweet
-			tweet.getHashtags().add(hashTag);
-
 		}
 	}
+	
 
 	// -------------------- GET METHODS --------------------
 	@Override
@@ -263,7 +262,11 @@ public class TweetServiceImpl implements TweetService {
 	// -------------------- POST METHODS --------------------
 	@Override
 	public TweetResponseDto createTweet(TweetRequestDto tweetRequestDto) {
-
+		if(tweetRequestDto.getContent() == null) {
+			throw new BadRequestException("Please enter content.");
+		}
+		
+		validateUser(tweetRequestDto.getCredentials());
 		// Check if credentials match an active user
 		Optional<User> optionalUser = userRepository.findByDeletedFalseAndCredentialsUsernameAndCredentialsPassword(
 				tweetRequestDto.getCredentials().getUsername(), tweetRequestDto.getCredentials().getPassword());
@@ -276,6 +279,8 @@ public class TweetServiceImpl implements TweetService {
 
 		Tweet tweet = tweetMapper.requestEntity(tweetRequestDto);
 		tweet.setAuthor(optionalUser.get());
+		Timestamp posted = Timestamp.valueOf(LocalDateTime.now());
+		tweet.setPosted(posted);
 
 		// Parse content for @{username} and #{hashtag}
 		parseContentForUsernameAndAddToUserMentions(tweet, tweetRequestDto.getContent());
