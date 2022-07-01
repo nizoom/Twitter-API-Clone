@@ -204,4 +204,21 @@ public class TweetServiceImpl implements TweetService {
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
 	}
 
+	@Override
+	public List<UserResponseDto> getMentions(Long tweetId) {
+	
+		Optional<Tweet> validatedTweet = validateTweet(tweetId);
+		
+		List <User> allUserMentions = validatedTweet.get().getUserMentions();
+		
+		List <User> mentionedUndeletedUsers = new ArrayList<>();
+		for(User user : allUserMentions) {
+			if(!user.isDeleted()) {
+				mentionedUndeletedUsers.add(user);
+			}
+		}
+		
+		return userMapper.entityToDto(mentionedUndeletedUsers);
+	}
+
 }
