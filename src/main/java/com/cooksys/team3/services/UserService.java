@@ -1,5 +1,6 @@
 package com.cooksys.team3.services;
 
+import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
 import com.cooksys.team3.dtos.UserRequestDto;
 import com.cooksys.team3.dtos.UserResponseDto;
@@ -24,9 +25,9 @@ public interface UserService {
 	
 	UserResponseDto createUser(UserRequestDto userRequestDto);
 	
-	void followUser(String username, UserRequestDto userRequestDto);
+	void followUser(String username, CredentialsDto credentialsDto);
 	
-	void unfollowUser(String username, UserRequestDto userRequestDto);
+	void unfollowUser(String username, CredentialsDto credentialsDto);
 	
 	UserResponseDto updateUsername(String username, UserRequestDto userRequestDto);
 

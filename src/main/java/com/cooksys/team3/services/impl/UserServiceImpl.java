@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
 import com.cooksys.team3.dtos.UserRequestDto;
 import com.cooksys.team3.dtos.UserResponseDto;
@@ -43,6 +44,15 @@ public class UserServiceImpl implements UserService {
 		}
 		if (userRequestDto.getCredentials().getPassword() == null) {
 			throw new BadRequestException("Please enter a password");
+		}
+	}
+	
+	private void validateCredentials(CredentialsDto credentialsDto) {
+		if(credentialsDto.getUsername() == null) {
+			throw new BadRequestException("Please enter a username.");
+		}
+		if(credentialsDto.getPassword() == null) {
+			throw new BadRequestException("Please enter a password.");
 		}
 	}
 
@@ -243,11 +253,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void followUser(String username, UserRequestDto userRequestDto) {
-		validateUser(userRequestDto);
+	public void followUser(String username, CredentialsDto credentialsDto) {
+		validateCredentials(credentialsDto);
 		Optional<User> pathUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
 		Optional<User> credentialsUser = userRepository
-				.findByDeletedFalseAndCredentialsUsername(userRequestDto.getCredentials().getUsername());
+				.findByDeletedFalseAndCredentialsUsername(credentialsDto.getUsername());
 		if (pathUser.isEmpty() || credentialsUser.isEmpty()) {
 			throw new NotFoundException("Specified user could not be found");
 		}
@@ -262,20 +272,20 @@ public class UserServiceImpl implements UserService {
 		} else {
 			followedUsers.add(userToBeFollowed);
 			followers.add(userWhoWantsToFollow);
+			userToBeFollowed.setFollowers(followers);
+			userWhoWantsToFollow.setFollowing(followedUsers);
+			userRepository.saveAndFlush(userWhoWantsToFollow);
+			userRepository.saveAndFlush(userToBeFollowed);
 		}
-		userToBeFollowed.setFollowers(followers);
-		userWhoWantsToFollow.setFollowing(followedUsers);
-		userRepository.saveAndFlush(userWhoWantsToFollow);
-		userRepository.saveAndFlush(userToBeFollowed);
-
+		
 	}
 
 	@Override
-	public void unfollowUser(String username, UserRequestDto userRequestDto) {
-		validateUser(userRequestDto);
+	public void unfollowUser(String username, CredentialsDto credentialsDto) {
+		validateCredentials(credentialsDto);
 		Optional<User> pathUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
 		Optional<User> credentialsUser = userRepository
-				.findByDeletedFalseAndCredentialsUsername(userRequestDto.getCredentials().getUsername());
+				.findByDeletedFalseAndCredentialsUsername(credentialsDto.getUsername());
 		if (pathUser.isEmpty() || credentialsUser.isEmpty()) {
 			throw new NotFoundException("Specified user could not be found");
 		}
@@ -287,13 +297,14 @@ public class UserServiceImpl implements UserService {
 		if (followedUsers.contains(userToBeUnfollowed)) {
 			followedUsers.remove(userToBeUnfollowed);
 			followers.remove(userWhoIsFollowing);
+			userToBeUnfollowed.setFollowers(followers);
+			userWhoIsFollowing.setFollowing(followedUsers);
+			userRepository.saveAndFlush(userWhoIsFollowing);
+			userRepository.saveAndFlush(userToBeUnfollowed);
 		} else {
 			throw new NotFoundException("No following relationship exists between users");
 		}
-		userToBeUnfollowed.setFollowers(followers);
-		userWhoIsFollowing.setFollowing(followedUsers);
-		userRepository.saveAndFlush(userWhoIsFollowing);
-		userRepository.saveAndFlush(userToBeUnfollowed);
+		
 	}
 
 	// -------------------- UPDATE METHODS --------------------
