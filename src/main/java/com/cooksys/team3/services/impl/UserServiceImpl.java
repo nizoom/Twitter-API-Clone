@@ -1,6 +1,7 @@
 package com.cooksys.team3.services.impl;
 
 import java.util.ArrayList;
+import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -281,12 +282,47 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserResponseDto createUser(UserRequestDto userRequestDto) {
 		//ensure required profile and credentials fields are entered 
+		validateUser(userRequestDto);
+		if(userRequestDto.getProfileDto().getEmail().isEmpty()) {
+			throw new BadRequestException("Please enter an email address");
+		}
+		String pw = userRequestDto.getCredentialsDto().getPassword();
+		String username = userRequestDto.getCredentialsDto().getUsername();
 		
-		//check if credentials match already existing but deleted user
+		Optional <User> existingUser = userRepository.findByCredentialsUsername(username);
 		
-		//if so restore user and restore tweets 
-		
-		//else add user to repository	
-		return null;
+		if(existingUser == null) {
+			
+		    long now = System.currentTimeMillis();
+	        Timestamp sqlTimestamp = new Timestamp(now);
+	
+			User newUser = userMapper.dtoToEntity(userRequestDto);
+			newUser.setDeleted(false);
+			newUser.setJoined(sqlTimestamp);
+			
+			
+			User userToReturn = userRepository.saveAndFlush(newUser);
+			return userMapper.entityToDto(userToReturn);
+			
+			
+		} else if(existingUser.get().getCredentials().getPassword() == pw && existingUser.get().isDeleted()) {
+//				change to deleted is false 
+			existingUser.get().setDeleted(false);
+
+			List<Tweet> deletedTweets = existingUser.get().getTweets();
+			
+			for(Tweet tweet : deletedTweets) {
+				tweet.setDeleted(false);
+			}
+			
+			User existingUserToReturn = userRepository.saveAndFlush(existingUser.get());
+			tweetRepository.saveAll(deletedTweets);
+			
+			return userMapper.entityToDto(existingUserToReturn);
+			
+		} else {
+			throw new BadRequestException("Username not available. Please try a different username");
+		}
+					
 	}
 }
