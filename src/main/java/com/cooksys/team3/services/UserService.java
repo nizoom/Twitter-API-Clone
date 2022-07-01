@@ -10,26 +10,26 @@ public interface UserService {
 
     List<UserResponseDto> getUsers();
 
-
-    UserResponseDto updateUsername(String username, UserRequestDto userRequestDto);
-
-    List<TweetResponseDto> getFeed(String username);
-
-    List<TweetResponseDto> getTweets(String username);
-
+	UserResponseDto getUser(String username);
+	
     List<UserResponseDto> getFollowers(String username);
+    
+    List<TweetResponseDto> getTweets(String username);
+ 
+    List<TweetResponseDto> getFeed(String username);
 
 	List<TweetResponseDto> getMentions(String username);
 
 	List<UserResponseDto> getFollowing(String username);
-
-	UserResponseDto getUser(String username);
-
+	
+	UserResponseDto createUser(UserRequestDto userRequestDto);
+	
+	void followUser(String username, UserRequestDto userRequestDto);
+	
 	void unfollowUser(String username, UserRequestDto userRequestDto);
+	
+	UserResponseDto updateUsername(String username, UserRequestDto userRequestDto);
 
 	UserResponseDto deleteUser(String username, UserRequestDto userRequestDto);
 
-	void followUser(String username, UserRequestDto userRequestDto);
-
-	UserResponseDto createUser(UserRequestDto userRequestDto);
 }
