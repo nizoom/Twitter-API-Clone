@@ -65,8 +65,6 @@ public class UserController {
 		userService.followUser(username, userRequestDto);
 	}
 	
-	
-	
 	// -------------------- UPDATE METHODS --------------------
 	@PatchMapping("/@{username}")
 	public UserResponseDto updateUsername(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
