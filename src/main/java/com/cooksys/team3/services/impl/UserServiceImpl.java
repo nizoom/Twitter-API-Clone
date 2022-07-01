@@ -58,10 +58,13 @@ public class UserServiceImpl implements UserService {
 		Optional<User> userUpdate = userRepository.findByDeletedFalseAndCredentialsUsernameAndCredentialsPassword(username, userRequestDto.getCredentialsDto().getPassword());
 
 		if(userUpdate.isEmpty()){
-			throw new BadRequestException("matching user could not be found");
+			throw new NotFoundException("Matching user could not be found");
 		}
 		if(userUpdate.get().getProfile().getEmail() == null) {
 			throw new BadRequestException("you must input an email address");
+		}
+		if(username != userUpdate.get().getCredentials().getUsername()) {
+			throw new BadRequestException("Provided username does not match Credentials");
 		}
 		User user = userUpdate.get();
 
