@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequiredArgsConstructor
@@ -84,7 +85,7 @@ public class UserController {
 	}
 	
 	@PostMapping
-	
+	@ResponseStatus(HttpStatus.CREATED)
 	public UserResponseDto createUser(@RequestBody UserRequestDto userRequestDto) {
 		return userService.createUser(userRequestDto);
 		
