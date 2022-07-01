@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import com.cooksys.team3.services.ValidateService;
 import org.springframework.stereotype.Service;
 
 import com.cooksys.team3.dtos.TweetResponseDto;
@@ -31,6 +32,8 @@ public class UserServiceImpl implements UserService {
 	private final TweetMapper tweetMapper;
 	private final TweetRepository tweetRepository;
 
+	private final ValidateService validateService;
+
 	private void validateUser(UserRequestDto userRequestDto) {
 		if (userRequestDto.getCredentialsDto() == null) {
 			throw new BadRequestException("Please enter username and password");
@@ -52,7 +55,28 @@ public class UserServiceImpl implements UserService {
 	public UserResponseDto updateUsername(String username, UserRequestDto userRequestDto) {
 		validateUser(userRequestDto);
 
-		return null;
+		Optional<User> userUpdate = userRepository.findByDeletedFalseAndCredentialsUsernameAndCredentialsPassword(username, userRequestDto.getCredentialsDto().getPassword());
+
+		if(userUpdate.isEmpty()){
+			throw new BadRequestException("matching user could not be found");
+		}
+		if(userUpdate.get().getProfile().getEmail() == null) {
+			throw new BadRequestException("you must input an email address");
+		}
+		User user = userUpdate.get();
+
+		user.getProfile().setFirstName(userRequestDto.getProfileDto().getFirstName());
+		user.getProfile().setLastName(userRequestDto.getProfileDto().getLastName());
+		user.getProfile().setEmail(userRequestDto.getProfileDto().getEmail());
+		user.getProfile().setPhone(userRequestDto.getProfileDto().getPhone());
+
+		return userMapper.entityToDto(userRepository.saveAndFlush(user));
+
+
+
+
+
+
 	}
 
 	@Override

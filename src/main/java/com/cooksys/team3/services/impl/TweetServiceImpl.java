@@ -5,13 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.cooksys.team3.dtos.*;
 import org.springframework.stereotype.Service;
 
-import com.cooksys.team3.dtos.ContextDto;
-import com.cooksys.team3.dtos.CredentialsDto;
-import com.cooksys.team3.dtos.TweetResponseDto;
-import com.cooksys.team3.dtos.UserRequestDto;
-import com.cooksys.team3.dtos.UserResponseDto;
 import com.cooksys.team3.entities.Tweet;
 import com.cooksys.team3.entities.User;
 import com.cooksys.team3.exceptions.BadRequestException;
@@ -203,6 +199,10 @@ public class TweetServiceImpl implements TweetService {
 		
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
 	}
+
+
+
+
 
 	@Override
 	public List<UserResponseDto> getMentions(Long tweetId) {
