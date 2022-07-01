@@ -1,13 +1,5 @@
 package com.cooksys.team3.dtos;
 
-import java.sql.Timestamp;
-import java.util.List;
-
-import com.cooksys.team3.entities.User;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,8 +8,8 @@ import lombok.NoArgsConstructor;
 
 public class UserRequestDto {
 	
-	private CredentialsDto credentialsDto;
+	private CredentialsDto credentials;
 	
-	private ProfileDto profileDto;	
+	private ProfileDto profile;	
 	
 }

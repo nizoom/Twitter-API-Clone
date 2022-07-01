@@ -290,7 +290,7 @@ public class TweetServiceImpl implements TweetService {
 
 	@Override
 	public void likeTweet(Long tweetId, UserRequestDto userRequestDto) {
-		Optional<User> validatedUser = validateUser(userRequestDto.getCredentialsDto());
+		Optional<User> validatedUser = validateUser(userRequestDto.getCredentials());
 
 		Optional<Tweet> validatedTweet = validateTweet(tweetId);
 
@@ -304,7 +304,7 @@ public class TweetServiceImpl implements TweetService {
 
 	@Override
 	public TweetResponseDto repostTweet(Long id, UserRequestDto userRequestDto) {
-		Optional<User> validatedUser = validateUser(userRequestDto.getCredentialsDto());
+		Optional<User> validatedUser = validateUser(userRequestDto.getCredentials());
 
 		Optional<Tweet> validatedTweet = validateTweet(id);
 
