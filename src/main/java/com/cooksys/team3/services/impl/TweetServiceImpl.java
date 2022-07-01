@@ -8,10 +8,18 @@ import java.util.Optional;
 import com.cooksys.team3.dtos.*;
 import org.springframework.stereotype.Service;
 
+import com.cooksys.team3.dtos.ContextDto;
+import com.cooksys.team3.dtos.CredentialsDto;
+import com.cooksys.team3.dtos.HashtagDto;
+import com.cooksys.team3.dtos.TweetResponseDto;
+import com.cooksys.team3.dtos.UserRequestDto;
+import com.cooksys.team3.dtos.UserResponseDto;
+import com.cooksys.team3.entities.Hashtag;
 import com.cooksys.team3.entities.Tweet;
 import com.cooksys.team3.entities.User;
 import com.cooksys.team3.exceptions.BadRequestException;
 import com.cooksys.team3.exceptions.NotFoundException;
+import com.cooksys.team3.mappers.HashtagMapper;
 import com.cooksys.team3.mappers.TweetMapper;
 import com.cooksys.team3.mappers.UserMapper;
 import com.cooksys.team3.repositories.TweetRepository;
@@ -28,6 +36,7 @@ public class TweetServiceImpl implements TweetService {
 	private final TweetRepository tweetRepository;
 	private final UserMapper userMapper;
 	private final UserRepository userRepository;
+	private final HashtagMapper hashtagMapper;
 
 	// -------------------- HELPER METHODS --------------------
 	private Optional<User> validateUser(CredentialsDto credentialsDto) {
@@ -219,6 +228,15 @@ public class TweetServiceImpl implements TweetService {
 		}
 		
 		return userMapper.entityToDto(mentionedUndeletedUsers);
+	}
+
+	@Override
+	public List<HashtagDto> getTags(Long tweetId) {
+		
+		Optional<Tweet> validatedTweet = validateTweet(tweetId);
+	
+		List <Hashtag> allHashtags = validatedTweet.get().getHashtags();
+		return hashtagMapper.entitiesToDtos(allHashtags);
 	}
 
 }

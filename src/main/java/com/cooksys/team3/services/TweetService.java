@@ -2,7 +2,12 @@ package com.cooksys.team3.services;
 
 import java.util.List;
 
-import com.cooksys.team3.dtos.*;
+
+import com.cooksys.team3.dtos.ContextDto;
+import com.cooksys.team3.dtos.HashtagDto;
+import com.cooksys.team3.dtos.TweetResponseDto;
+import com.cooksys.team3.dtos.UserRequestDto;
+import com.cooksys.team3.dtos.UserResponseDto;
 
 public interface TweetService {
 
@@ -24,5 +29,7 @@ public interface TweetService {
 
 
 	List<UserResponseDto> getMentions(Long id);
+
+	List<HashtagDto> getTags(Long id);
 
 }

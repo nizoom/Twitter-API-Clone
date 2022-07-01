@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+import com.cooksys.team3.dtos.ContextDto;
+import com.cooksys.team3.dtos.HashtagDto;
+import com.cooksys.team3.dtos.TweetResponseDto;
+import com.cooksys.team3.dtos.UserRequestDto;
+import com.cooksys.team3.dtos.UserResponseDto;
 import com.cooksys.team3.services.TweetService;
 
 import lombok.RequiredArgsConstructor;
@@ -54,6 +60,11 @@ public class TweetController {
 	@GetMapping("{id}/mentions")
 	public List <UserResponseDto> getMentions (@PathVariable Long id){
 		return tweetService.getMentions(id);
+	}
+	
+	@GetMapping("{id}/tags")
+	public List <HashtagDto> getTags (@PathVariable Long id){
+		return tweetService.getTags(id);
 	}
 
 	@PostMapping("/{id}/like")
