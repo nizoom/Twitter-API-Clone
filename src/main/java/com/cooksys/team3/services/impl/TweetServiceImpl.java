@@ -92,45 +92,55 @@ public class TweetServiceImpl implements TweetService {
 		return tweet;
 
 	}
-
+	
 	private void parseContentForUsernameAndAddToUserMentions(Tweet tweet, String content) {
-		String[] words = content.split(" ");
-		for(String word : words) {
-			if(word.startsWith("@")) {
-				word.replace("@", "");
-				Optional<User> optUser = userRepository.findByCredentialsUsername(word);
-				if(optUser.isPresent()) {
-					User mentionedUserobj = optUser.get();
-					tweet.getUserMentions().add(mentionedUserobj);
-				}
+		String patternst = "@[a-zA-Z0-9]*";
+		Pattern pattern = Pattern.compile(patternst);
+		Matcher matcher = pattern.matcher(content);
+		while (matcher.find()) {
+			String mentionedUser = matcher.group(0);
+			// removes @ symbol
+			mentionedUser.replace("@", "");
+			// searches repository for matching user
+			Optional<User> optUser = userRepository.findByCredentialsUsername(mentionedUser);
+			if (optUser.isPresent()) {
+				// if matching user is found add to mentions
+				User mentionedUserObj = optUser.get();
+				tweet.getUserMentions().add(mentionedUserObj);
 			}
 		}
 	}
 	
 	private void parseContentForHashtagAndAddToTweetHashtags(Tweet tweet, String content) {
-		String[] words = content.split(" ");
-		for(String word : words) {
-			if(word.startsWith("#")) {
-				word.replace("#", "");
-				Optional<Hashtag> optHashtag = hashtagRepository.findByLabel(word);
-				if(optHashtag.isPresent()) {
-					Hashtag hashtag = optHashtag.get();
-					hashtag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
-					tweet.getHashtags().add(hashtag);
-				}
-				else {
-					Hashtag hashtag = new Hashtag();
-					hashtag.setLabel(word);
-					hashtag.setFirstUsed(Timestamp.valueOf(LocalDateTime.now()));
-					hashtag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
-					tweet.getHashtags().add(hashtag);
-					hashtagRepository.saveAndFlush(hashtag);
-					
-				}
+		// pattern to look for
+		String patternString = "#[a-zA-Z0-9]*";
+
+		Pattern pattern = Pattern.compile(patternString);
+		Hashtag hashTag = new Hashtag();
+		Matcher matcher = pattern.matcher(content);
+		while (matcher.find()) {
+			String usedTag = matcher.group(0);
+			usedTag.replace("#", "");
+			Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel(usedTag);
+
+			// checks if hashtag exists and updates last used
+			if (!optionalHashtag.isEmpty()) {
+				hashTag = optionalHashtag.get();
+				hashTag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
+
 			}
+			// creates new hashtag if it doesn't exist
+			else {
+				hashTag.setLabel(usedTag);
+				hashTag.setFirstUsed(Timestamp.valueOf(LocalDateTime.now()));
+				hashTag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
+				hashtagRepository.saveAndFlush(hashTag);
+			}
+			// sets hashtags for tweet
+			tweet.getHashtags().add(hashTag);
+
 		}
 	}
-	
 
 	// -------------------- GET METHODS --------------------
 	@Override
