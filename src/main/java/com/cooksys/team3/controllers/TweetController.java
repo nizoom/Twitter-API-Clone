@@ -60,7 +60,7 @@ public class TweetController {
 		return tweetService.getMentions(id);
 	}
 	
-	@GetMapping("{id}/mentions")
+	@GetMapping("{id}/tags")
 	public List <HashtagDto> getTags (@PathVariable Long id){
 		return tweetService.getTags(id);
 	}
