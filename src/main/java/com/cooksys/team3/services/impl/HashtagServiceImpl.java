@@ -21,9 +21,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HashtagServiceImpl implements HashtagService {
 
-	private HashtagRepository hashtagRepository;
-	private HashtagMapper hashtagMapper;
-
+	private final HashtagRepository hashtagRepository;
+	private final HashtagMapper hashtagMapper;
+	
 	private final TweetMapper tweetMapper;
 
 	@Override
@@ -34,7 +34,7 @@ public class HashtagServiceImpl implements HashtagService {
 	@Override
 	public List<TweetResponseDto> taggedTweets(String label) {
 
-		Optional<Hashtag> checkExist = hashtagRepository.findAllByLabel(label);
+		List<Hashtag> checkExist = hashtagRepository.findAllByLabel(label);
 		if(checkExist.isEmpty()){
 			throw new NotFoundException("This hashtag does not exist");
 		}
@@ -44,18 +44,11 @@ public class HashtagServiceImpl implements HashtagService {
 		for (Tweet tweet : allTagged) {
 			if (!tweet.isDeleted()) {
 				taggedNotDeleted.add(tweet);
-
 			}
-
-
 		}
 		taggedNotDeleted.sort(Comparator.comparing(Tweet::getPosted).reversed());
 
-
 		return tweetMapper.entitiesToDtos(taggedNotDeleted);
 	}
-
-
-
 
 }

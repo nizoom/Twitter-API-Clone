@@ -112,7 +112,7 @@ public class TweetServiceImpl implements TweetService {
 		while (matcher.find()) {
 			String usedTag = secondMatcher.group(1);
 			usedTag.replace("#", "");
-			Optional<Hashtag> optionalHashtag = hashtagRepository.findAllByLabel(usedTag);
+			Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel(usedTag);
 
 			// checks if hashtag exists and updates last used
 			if (!optionalHashtag.isEmpty()) {
