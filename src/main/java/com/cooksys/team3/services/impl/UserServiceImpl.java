@@ -209,7 +209,7 @@ public class UserServiceImpl implements UserService {
 		validateUser(userRequestDto);
 		
 		if (userRequestDto.getProfile() == null) {
-			throw new BadRequestException("Please enter an email address");
+			throw new BadRequestException("Please enter an a profile.");
 		} else if (userRequestDto.getProfile().getEmail() == null) {
 			throw new BadRequestException("Please enter an email address");
 		}
@@ -310,26 +310,40 @@ public class UserServiceImpl implements UserService {
 	// -------------------- UPDATE METHODS --------------------
 	@Override
 	public UserResponseDto updateUsername(String username, UserRequestDto userRequestDto) {
+		// Validate that all required info was went in userRequestDto
 		validateUser(userRequestDto);
-
+		
+		if (userRequestDto.getProfile() == null) {
+			throw new BadRequestException("You must input a profile.");
+		}
+		
+		// Grab user from repository and verify user
 		Optional<User> userUpdate = userRepository.findByDeletedFalseAndCredentialsUsernameAndCredentialsPassword(
 				username, userRequestDto.getCredentials().getPassword());
 
 		if (userUpdate.isEmpty()) {
 			throw new NotFoundException("Matching user could not be found");
 		}
-		if (userUpdate.get().getProfile().getEmail() == null) {
-			throw new BadRequestException("you must input an email address");
-		}
-		if (username != userUpdate.get().getCredentials().getUsername()) {
+		if (!username.equals(userUpdate.get().getCredentials().getUsername())) {
 			throw new BadRequestException("Provided username does not match Credentials");
 		}
+		
+		// Put updated info into user (if info is null, assume the user does not want to update that piece of info)
+		
 		User user = userUpdate.get();
-
-		user.getProfile().setFirstName(userRequestDto.getProfile().getFirstName());
-		user.getProfile().setLastName(userRequestDto.getProfile().getLastName());
-		user.getProfile().setEmail(userRequestDto.getProfile().getEmail());
-		user.getProfile().setPhone(userRequestDto.getProfile().getPhone());
+		
+		if (userRequestDto.getProfile().getFirstName() != null) {
+			user.getProfile().setFirstName(userRequestDto.getProfile().getFirstName());
+		}
+		if (userRequestDto.getProfile().getLastName() != null) {
+			user.getProfile().setLastName(userRequestDto.getProfile().getLastName());
+		}
+		if (userRequestDto.getProfile().getEmail() != null) {
+			user.getProfile().setEmail(userRequestDto.getProfile().getEmail());
+		}
+		if (userRequestDto.getProfile().getPhone() != null) {
+			user.getProfile().setPhone(userRequestDto.getProfile().getPhone());
+		}
 
 		return userMapper.entityToDto(userRepository.saveAndFlush(user));
 

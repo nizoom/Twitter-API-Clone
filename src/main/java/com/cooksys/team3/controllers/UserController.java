@@ -80,8 +80,6 @@ public class UserController {
 		userService.unfollowUser(username, credentialsDto);
 	}
 	
-	
-	
 	// -------------------- UPDATE METHODS --------------------
 	@PatchMapping("/@{username}")
 	public UserResponseDto updateUsername(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
