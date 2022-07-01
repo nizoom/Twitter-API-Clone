@@ -30,6 +30,7 @@ public class TweetController {
 
 	private final TweetService tweetService;
 
+	// -------------------- GET METHODS --------------------
 	@GetMapping
 	public List<TweetResponseDto> getAllTweets() {
 		return tweetService.getAllTweets();
@@ -70,10 +71,11 @@ public class TweetController {
 		return tweetService.getTags(id);
 	}
 
-	@PostMapping
+	// -------------------- POST METHODS --------------------
 	@ResponseStatus(HttpStatus.CREATED)
-	public TweetResponseDto createTweet(@RequestBody String content, @RequestBody CredentialsDto credentialsDto) {
-		return tweetService.createTweet(content, credentialsDto);
+	@PostMapping
+	public TweetResponseDto createTweet(@RequestBody TweetRequestDto tweetRequestDto) {
+		return tweetService.createTweet(tweetRequestDto);
 	}
 
 	@PostMapping("/{id}/like")
@@ -91,6 +93,7 @@ public class TweetController {
 		return tweetService.replyTweet(id, tweetRequestDto);
 	}
 
+	// -------------------- DELETE METHOD --------------------
 	@DeleteMapping("/{id}")
 	public TweetResponseDto deleteTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
 		return tweetService.deleteTweet(id, credentialsDto);

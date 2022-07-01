@@ -262,15 +262,11 @@ public class TweetServiceImpl implements TweetService {
 
 	// -------------------- POST METHODS --------------------
 	@Override
-	public TweetResponseDto createTweet(String content, CredentialsDto credentialsDto) {
-		// Convert content and credentialsDto into tweetRequestDto
-		TweetRequestDto tweetRequestDto = new TweetRequestDto();
-		tweetRequestDto.setContent(content);
-		tweetRequestDto.setCredentialsDto(credentialsDto);
+	public TweetResponseDto createTweet(TweetRequestDto tweetRequestDto) {
 
 		// Check if credentials match an active user
 		Optional<User> optionalUser = userRepository.findByDeletedFalseAndCredentialsUsernameAndCredentialsPassword(
-				credentialsDto.getUsername(), credentialsDto.getPassword());
+				tweetRequestDto.getCredentials().getUsername(), tweetRequestDto.getCredentials().getPassword());
 
 		if (optionalUser.isEmpty()) {
 			throw new NotFoundException("There is no user with those credentials in the database.");
@@ -282,8 +278,8 @@ public class TweetServiceImpl implements TweetService {
 		tweet.setAuthor(optionalUser.get());
 
 		// Parse content for @{username} and #{hashtag}
-		parseContentForUsernameAndAddToUserMentions(tweet, content);
-		parseContentForHashtagAndAddToTweetHashtags(tweet, content);
+		parseContentForUsernameAndAddToUserMentions(tweet, tweetRequestDto.getContent());
+		parseContentForHashtagAndAddToTweetHashtags(tweet, tweetRequestDto.getContent());
 
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
 	}
@@ -322,8 +318,8 @@ public class TweetServiceImpl implements TweetService {
 	public TweetResponseDto replyTweet(Long id, TweetRequestDto tweetRequestDto) {
 
 		validateTweet(id);
-		validateUser(tweetRequestDto.getCredentialsDto());
-		User author = validateUser(tweetRequestDto.getCredentialsDto()).get();
+		validateUser(tweetRequestDto.getCredentials());
+		User author = validateUser(tweetRequestDto.getCredentials()).get();
 		Tweet tweetReply = validateTweet(id).get();
 
 		// throws an error if the reply is empty
