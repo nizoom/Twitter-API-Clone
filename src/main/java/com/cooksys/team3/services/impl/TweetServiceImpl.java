@@ -353,4 +353,25 @@ public class TweetServiceImpl implements TweetService {
 
 	}
 
+	// -------------------- DELETE METHOD --------------------
+	@Override
+	public TweetResponseDto deleteTweet(Long id, CredentialsDto credentialsDto) {
+		// Check if user exists
+		Optional<User> optionalUser = userRepository.findByDeletedFalseAndCredentialsUsernameAndCredentialsPassword(
+				credentialsDto.getUsername(), credentialsDto.getPassword());
+
+		if (optionalUser.isEmpty()) {
+			throw new NotFoundException("There is no user with those credentials in the database.");
+		} else if (optionalUser.get().isDeleted()) {
+			throw new NotFoundException("The user with those credentials has been deleted");
+		}
+		
+		// Delete tweet if exists
+		Tweet tweet = validateTweet(id).get();
+		tweet.setDeleted(true);
+		tweetRepository.saveAndFlush(tweet);
+		
+		return tweetMapper.entityToDto(tweet);
+	}
+
 }

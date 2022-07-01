@@ -3,6 +3,7 @@ package com.cooksys.team3.controllers;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,7 +66,7 @@ public class TweetController {
 	}
 
 	@GetMapping("{id}/tags")
-	public List <HashtagDto> getTags (@PathVariable Long id){
+	public List<HashtagDto> getTags(@PathVariable Long id) {
 		return tweetService.getTags(id);
 	}
 
@@ -88,6 +89,11 @@ public class TweetController {
 	@PostMapping("/{id}/reply")
 	public TweetResponseDto replyTweet(@PathVariable Long id, @RequestBody TweetRequestDto tweetRequestDto) {
 		return tweetService.replyTweet(id, tweetRequestDto);
+	}
+
+	@DeleteMapping("/{id}")
+	public TweetResponseDto deleteTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+		return tweetService.deleteTweet(id, credentialsDto);
 	}
 
 }
