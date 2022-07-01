@@ -12,8 +12,7 @@ import com.cooksys.team3.dtos.UserResponseDto;
 
 public interface TweetService {
 
-	 
-
+	// -------------------- GET METHODS --------------------
 	List<TweetResponseDto> getAllTweets();
 
 	TweetResponseDto getTweetById(Long id);
@@ -30,7 +29,8 @@ public interface TweetService {
 
 	List<HashtagDto> getTags(Long id);
 
-	TweetResponseDto createTweet(String content, CredentialsDto credentialsDto);
+	// -------------------- POST METHODS --------------------
+	TweetResponseDto createTweet(TweetRequestDto tweetRequestDto);
 
 	void likeTweet(Long tweetId, UserRequestDto userRequestDto);
 
@@ -38,5 +38,6 @@ public interface TweetService {
 
 	TweetResponseDto replyTweet(Long id, TweetRequestDto tweetRequestDto);
 
+	// -------------------- DELETE METHOD --------------------
 	TweetResponseDto deleteTweet(Long id, CredentialsDto credentialsDto);
 }

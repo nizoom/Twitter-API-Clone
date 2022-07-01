@@ -88,8 +88,8 @@ public class UserController {
 
 	// -------------------- DELETE METHODS --------------------
 	@DeleteMapping("/@{username}")
-	public UserResponseDto deleteUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
-		return userService.deleteUser(username, userRequestDto);
+	public UserResponseDto deleteUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
+		return userService.deleteUser(username, credentialsDto);
 	}
 	
 }
