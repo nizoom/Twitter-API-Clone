@@ -31,6 +31,6 @@ public interface UserService {
 	
 	UserResponseDto updateUsername(String username, UserRequestDto userRequestDto);
 
-	UserResponseDto deleteUser(String username, UserRequestDto userRequestDto);
+	UserResponseDto deleteUser(String username, CredentialsDto credentialsDto);
 
 }

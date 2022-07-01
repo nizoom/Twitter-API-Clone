@@ -231,7 +231,7 @@ public class UserServiceImpl implements UserService {
 			User userToReturn = userRepository.saveAndFlush(newUser);
 			return userMapper.entityToDto(userToReturn);
 			
-		} else if (optionalUser.get().getCredentials().getPassword() == pw && optionalUser.get().isDeleted()) {
+		} else if (optionalUser.get().getCredentials().getPassword().equals(pw) && optionalUser.get().isDeleted()) {
 			// change to deleted is false 
 			optionalUser.get().setDeleted(false);
 
@@ -351,9 +351,9 @@ public class UserServiceImpl implements UserService {
 
 	// -------------------- DELETE METHODS --------------------
 	@Override
-	public UserResponseDto deleteUser(String username, UserRequestDto userRequestDto) {
+	public UserResponseDto deleteUser(String username, CredentialsDto credentialsDto) {
 
-		validateUser(userRequestDto);
+		validateCredentials(credentialsDto);
 
 		if (!userRepository.existsByCredentialsUsername(username)) {
 			throw new NotFoundException("Specified user could not be found");
@@ -361,7 +361,7 @@ public class UserServiceImpl implements UserService {
 
 		Optional<User> userToBeDeleted = userRepository.findByDeletedFalseAndCredentialsUsername(username);
 
-//		change all tweets to be deleted as well 
+		// change all tweets to be deleted as well 
 
 		List<Tweet> tweetsToBeDeleted = userToBeDeleted.get().getTweets();
 		for (Tweet tweet : tweetsToBeDeleted) {
