@@ -2,7 +2,9 @@ package com.cooksys.team3.services.impl;
 
 import com.cooksys.team3.dtos.HashtagDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
+import com.cooksys.team3.entities.Hashtag;
 import com.cooksys.team3.entities.Tweet;
+import com.cooksys.team3.exceptions.NotFoundException;
 import com.cooksys.team3.mappers.HashtagMapper;
 import com.cooksys.team3.mappers.TweetMapper;
 import com.cooksys.team3.repositories.HashtagRepository;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,12 @@ public class HashtagServiceImpl implements HashtagService {
 
 	@Override
 	public List<TweetResponseDto> taggedTweets(String label) {
+
+		Optional<Hashtag> checkExist = hashtagRepository.findAllByLabel(label);
+		if(checkExist.isEmpty()){
+			throw new NotFoundException("This hashtag does not exist");
+		}
+
 		List<Tweet> allTagged = hashtagRepository.getHashtagTweets(label);
 		List<Tweet> taggedNotDeleted = new ArrayList<>();
 		for (Tweet tweet : allTagged) {
@@ -41,6 +50,8 @@ public class HashtagServiceImpl implements HashtagService {
 
 		}
 		taggedNotDeleted.sort(Comparator.comparing(Tweet::getPosted).reversed());
+
+
 		return tweetMapper.entitiesToDtos(taggedNotDeleted);
 	}
 
