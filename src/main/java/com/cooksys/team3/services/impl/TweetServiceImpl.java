@@ -306,6 +306,8 @@ public class TweetServiceImpl implements TweetService {
 		tweet.setAuthor(optionalUser.get());
 		Timestamp posted = Timestamp.valueOf(LocalDateTime.now());
 		tweet.setPosted(posted);
+		tweet.setInReplyTo(null);
+		tweet.setRepostOf(null);
 
 		// Parse content for @{username} and #{hashtag}
 		parseContentForUsernameAndAddToUserMentions(tweet, tweetRequestDto.getContent());
@@ -337,14 +339,16 @@ public class TweetServiceImpl implements TweetService {
 		Optional<Tweet> validatedTweet = validateTweet(id);
 
 		Tweet tweet = validatedTweet.get();
+		Tweet repostedTweet = new Tweet();
 
-		tweet.setContent(null);
-		tweet.setRepostOf(tweet);
-		tweet.setAuthor(validatedUser.get());
+		repostedTweet.setContent(null);
+		repostedTweet.setRepostOf(tweet);
+		repostedTweet.setInReplyTo(null);
+		repostedTweet.setAuthor(validatedUser.get());
 		Timestamp posted = Timestamp.valueOf(LocalDateTime.now());
-		tweet.setPosted(posted);
+		repostedTweet.setPosted(posted);
 
-		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repostedTweet));
 	}
 
 	@Override
