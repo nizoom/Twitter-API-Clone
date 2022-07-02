@@ -84,8 +84,8 @@ public class TweetController {
 	}
 
 	@PostMapping("/{id}/repost")
-	public TweetResponseDto repostTweet(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto) {
-		return tweetService.repostTweet(id, userRequestDto);
+	public TweetResponseDto repostTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+		return tweetService.repostTweet(id, credentialsDto);
 	}
 
 	@PostMapping("/{id}/reply")

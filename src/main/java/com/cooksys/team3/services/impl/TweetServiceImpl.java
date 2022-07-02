@@ -62,7 +62,7 @@ public class TweetServiceImpl implements TweetService {
 
 		Optional<User> matchingUser = userRepository.findByDeletedFalseAndCredentialsUsername(username);
 
-		if (matchingUser == null) {
+		if (matchingUser.isEmpty()) {
 			throw new NotFoundException("Specified user could not be found");
 		}
 
@@ -100,7 +100,7 @@ public class TweetServiceImpl implements TweetService {
 		while (matcher.find()) {
 			String mentionedUser = matcher.group(0);
 			// removes @ symbol
-			mentionedUser.replace("@", "");
+			mentionedUser = mentionedUser.replace("@", "");
 			// searches repository for matching user
 			Optional<User> optUser = userRepository.findByCredentialsUsername(mentionedUser);
 			if (optUser.isPresent()) {
@@ -120,7 +120,7 @@ public class TweetServiceImpl implements TweetService {
 		Matcher matcher = pattern.matcher(content);
 		while (matcher.find()) {
 			String usedTag = matcher.group(0);
-			usedTag.replace("#", "");
+			usedTag = usedTag.replace("#", "");
 			Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel(usedTag);
 
 			// checks if hashtag exists and updates last used
@@ -321,8 +321,8 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
-	public TweetResponseDto repostTweet(Long id, UserRequestDto userRequestDto) {
-		Optional<User> validatedUser = validateUser(userRequestDto.getCredentials());
+	public TweetResponseDto repostTweet(Long id, CredentialsDto credentialsDto) {
+		Optional<User> validatedUser = validateUser(credentialsDto);
 
 		Optional<Tweet> validatedTweet = validateTweet(id);
 
@@ -331,7 +331,8 @@ public class TweetServiceImpl implements TweetService {
 		tweet.setContent(null);
 		tweet.setRepostOf(tweet);
 		tweet.setAuthor(validatedUser.get());
-		tweet.setPosted(new Timestamp(System.currentTimeMillis()));
+		Timestamp posted = Timestamp.valueOf(LocalDateTime.now());
+		tweet.setPosted(posted);
 
 		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
 	}
