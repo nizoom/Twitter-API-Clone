@@ -368,6 +368,7 @@ public class TweetServiceImpl implements TweetService {
 		Tweet tweet = new Tweet();
 		tweet.setContent(tweetRequestDto.getContent());
 		tweet.setAuthor(author);
+		tweet.setPosted(Timestamp.valueOf(LocalDateTime.now()));
 
 		// parse for mentioned
 		String text = tweetRequestDto.getContent();
@@ -377,13 +378,16 @@ public class TweetServiceImpl implements TweetService {
 		String hashtext = tweetRequestDto.getContent();
 		parseContentForHashtagAndAddToTweetHashtags(tweet, hashtext);
 
-		Tweet saveTweet = tweetRepository.save(tweet);
-		// adds this new tweet to replies of original tweet
-		tweetReply.getReplyTweets().add(saveTweet);
-		// sets in reply to
-		saveTweet.setInReplyTo(validateTweet(id).get());
 
-		return tweetMapper.entityToDto(saveTweet);
+
+
+		// adds this new tweet to replies of original tweet
+		tweetReply.getReplyTweets().add(tweet);
+		// sets in reply to
+		tweet.setInReplyTo(validateTweet(id).get());
+
+
+		return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
 
 	}
 
