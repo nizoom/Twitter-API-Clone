@@ -306,10 +306,17 @@ public class TweetServiceImpl implements TweetService {
 		Optional<Tweet> validatedTweet = validateTweet(tweetId);
 
 		List<User> usersWhoLikeThisTweet = validatedTweet.get().getUserLikes();
+		
+//		if user already like tweet then throw error
+		if(usersWhoLikeThisTweet.contains(validatedUser.get())){
+			throw new BadRequestException("You have already liked this tweet");
+		} else {
+			usersWhoLikeThisTweet.add(validatedUser.get());
 
-		usersWhoLikeThisTweet.add(validatedUser.get());
+			tweetRepository.saveAndFlush(validatedTweet.get());
+		}
 
-		tweetRepository.saveAndFlush(validatedTweet.get());
+		
 
 	}
 
