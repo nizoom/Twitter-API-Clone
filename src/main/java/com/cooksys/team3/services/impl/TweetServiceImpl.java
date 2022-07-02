@@ -15,7 +15,6 @@ import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.HashtagDto;
 import com.cooksys.team3.dtos.TweetRequestDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
-import com.cooksys.team3.dtos.UserRequestDto;
 import com.cooksys.team3.dtos.UserResponseDto;
 import com.cooksys.team3.entities.Hashtag;
 import com.cooksys.team3.entities.Tweet;
@@ -316,23 +315,18 @@ public class TweetServiceImpl implements TweetService {
 	}
 
 	@Override
-	public void likeTweet(Long tweetId, UserRequestDto userRequestDto) {
-		Optional<User> validatedUser = validateUser(userRequestDto.getCredentials());
+	public void likeTweet(Long tweetId, CredentialsDto credentialsDto) {
+		Optional<User> validatedUser = validateUser(credentialsDto);
 
 		Optional<Tweet> validatedTweet = validateTweet(tweetId);
 
 		List<User> usersWhoLikeThisTweet = validatedTweet.get().getUserLikes();
 		
-//		if user already like tweet then throw error
-		if(usersWhoLikeThisTweet.contains(validatedUser.get())){
-			throw new BadRequestException("You have already liked this tweet");
-		} else {
+		// Only like tweet if have not liked tweet yet; if already liked tweet, nothing happens
+		if(!usersWhoLikeThisTweet.contains(validatedUser.get())){
 			usersWhoLikeThisTweet.add(validatedUser.get());
-
 			tweetRepository.saveAndFlush(validatedTweet.get());
-		}
-
-		
+		} 
 
 	}
 
