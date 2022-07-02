@@ -138,7 +138,7 @@ public class TweetServiceImpl implements TweetService {
 			}
 			// creates new hashtag if it doesn't exist
 			else {
-				hashTag.setLabel(usedTag);
+				hashTag.setLabel(tagNoSymbol);
 				hashTag.setFirstUsed(Timestamp.valueOf(LocalDateTime.now()));
 				hashTag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
 				hashtagRepository.saveAndFlush(hashTag);
@@ -152,6 +152,8 @@ public class TweetServiceImpl implements TweetService {
 			List<Tweet> tweets = hashTag.getTweets();
 			tweets.add(tweet);
 			hashTag.setTweets(tweets);
+			
+			System.out.println(hashTag.getLabel());
 
 		}
 	}
