@@ -17,9 +17,8 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
 
 	Optional<Hashtag> findByLabel(String hashtag);
 
-	List<Hashtag> findAllByLabel(String label);
 
-	@Query(value = "SELECT tweet FROM hashtag IN hashtag.tweets WHERE hashtag.label = ?1", nativeQuery = true)
-	List<Tweet> getHashtagTweets(String label);
+
+	List<Tweet> findAllByLabel(String label);
 
 }

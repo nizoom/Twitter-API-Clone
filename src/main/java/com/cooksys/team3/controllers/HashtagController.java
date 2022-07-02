@@ -2,6 +2,7 @@ package com.cooksys.team3.controllers;
 
 import java.util.List;
 
+import com.cooksys.team3.entities.Tweet;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +26,7 @@ public class HashtagController {
 	}
 
 	@GetMapping("/{label}")
-	public List<TweetResponseDto> taggedTweets(String label) {
+	public List<Tweet> taggedTweets(String label) {
 		return hashtagService.taggedTweets(label);
 	}
 

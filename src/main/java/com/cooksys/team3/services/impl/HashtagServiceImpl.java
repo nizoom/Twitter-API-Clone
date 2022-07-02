@@ -9,6 +9,7 @@ import com.cooksys.team3.mappers.HashtagMapper;
 import com.cooksys.team3.mappers.TweetMapper;
 import com.cooksys.team3.repositories.HashtagRepository;
 import com.cooksys.team3.services.HashtagService;
+import com.cooksys.team3.services.TweetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,9 @@ public class HashtagServiceImpl implements HashtagService {
 
 	private final HashtagRepository hashtagRepository;
 	private final HashtagMapper hashtagMapper;
-	
+
 	private final TweetMapper tweetMapper;
+	private final TweetService tweetService;
 
 	@Override
 	public List<HashtagDto> getTags() {
@@ -32,23 +34,23 @@ public class HashtagServiceImpl implements HashtagService {
 	}
 
 	@Override
-	public List<TweetResponseDto> taggedTweets(String label) {
+	public List<Tweet> taggedTweets(String label) {
 
-		List<Hashtag> checkExist = hashtagRepository.findAllByLabel(label);
-		if(checkExist.isEmpty()){
-			throw new NotFoundException("This hashtag does not exist");
-		}
+		List<TweetResponseDto> allTweets = tweetService.getAllTweets();
+		List <TweetResponseDto> hashtaggedtweets = new ArrayList<>();
+		for(TweetResponseDto tweet: allTweets){
+			if (tweet.getContent().contains("#" + label))
+			{
+				hashtaggedtweets.add(tweet);
 
-		List<Tweet> allTagged = hashtagRepository.getHashtagTweets(label);
-		List<Tweet> taggedNotDeleted = new ArrayList<>();
-		for (Tweet tweet : allTagged) {
-			if (!tweet.isDeleted()) {
-				taggedNotDeleted.add(tweet);
 			}
 		}
-		taggedNotDeleted.sort(Comparator.comparing(Tweet::getPosted).reversed());
-
-		return tweetMapper.entitiesToDtos(taggedNotDeleted);
+		List<Tweet> newTweet = new ArrayList<>();
+		for(TweetResponseDto tw: hashtaggedtweets)
+		{
+			newTweet.add(tweetMapper.requestEntityResponse(tw));
+		}
+		return newTweet;
 	}
 
 }

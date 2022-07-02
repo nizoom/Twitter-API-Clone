@@ -11,5 +11,5 @@ public interface HashtagService {
 
 	List<HashtagDto> getTags();
 
-    List<TweetResponseDto> taggedTweets(String label);
+    List<Tweet> taggedTweets(String label);
 }
