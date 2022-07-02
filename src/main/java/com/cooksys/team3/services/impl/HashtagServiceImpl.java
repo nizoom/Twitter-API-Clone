@@ -36,13 +36,21 @@ public class HashtagServiceImpl implements HashtagService {
 	@Override
 	public List<Tweet> taggedTweets(String label) {
 
+		Optional<Hashtag> hash= hashtagRepository.findByLabel(label);
+
+		if(hash.isEmpty()){
+			throw new NotFoundException("hashtag does not exist");
+		}
+
 		List<TweetResponseDto> allTweets = tweetService.getAllTweets();
 		List <TweetResponseDto> hashtaggedtweets = new ArrayList<>();
-		for(TweetResponseDto tweet: allTweets){
-			if (tweet.getContent().contains("#" + label))
-			{
-				hashtaggedtweets.add(tweet);
+		for(TweetResponseDto tweet: allTweets) {
 
+			if (tweet.getContent() != null) {
+				if (tweet.getContent().contains("#" + label)) {
+					hashtaggedtweets.add(tweet);
+
+				}
 			}
 		}
 		List<Tweet> newTweet = new ArrayList<>();
