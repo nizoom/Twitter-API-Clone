@@ -100,13 +100,20 @@ public class TweetServiceImpl implements TweetService {
 		while (matcher.find()) {
 			String mentionedUser = matcher.group(0);
 			// removes @ symbol
-			mentionedUser = mentionedUser.replace("@", "");
+			String userNoSymbol = mentionedUser.substring(1);
 			// searches repository for matching user
-			Optional<User> optUser = userRepository.findByCredentialsUsername(mentionedUser);
+			Optional<User> optUser = userRepository.findByCredentialsUsername(userNoSymbol);
+			List<User> userMentions = tweet.getUserMentions();
 			if (optUser.isPresent()) {
-				// if matching user is found add to mentions
+				// if matching user is found add to Tweet userMentions
 				User mentionedUserObj = optUser.get();
-				tweet.getUserMentions().add(mentionedUserObj);
+				userMentions.add(mentionedUserObj);
+				tweet.setUserMentions(userMentions);
+				
+				// Also add tweet to User mentions
+				List<Tweet> mentions = mentionedUserObj.getMentions();
+				mentions.add(tweet);
+				mentionedUserObj.setMentions(mentions);
 			}
 		}
 	}
@@ -120,8 +127,8 @@ public class TweetServiceImpl implements TweetService {
 		Matcher matcher = pattern.matcher(content);
 		while (matcher.find()) {
 			String usedTag = matcher.group(0);
-			usedTag = usedTag.replace("#", "");
-			Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel(usedTag);
+			String tagNoSymbol = usedTag.substring(1);
+			Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel(tagNoSymbol);
 
 			// checks if hashtag exists and updates last used
 			if (!optionalHashtag.isEmpty()) {
@@ -131,13 +138,22 @@ public class TweetServiceImpl implements TweetService {
 			}
 			// creates new hashtag if it doesn't exist
 			else {
-				hashTag.setLabel(usedTag);
+				hashTag.setLabel(tagNoSymbol);
 				hashTag.setFirstUsed(Timestamp.valueOf(LocalDateTime.now()));
 				hashTag.setLastUsed(Timestamp.valueOf(LocalDateTime.now()));
 				hashtagRepository.saveAndFlush(hashTag);
 			}
 			// sets hashtags for tweet
-			tweet.getHashtags().add(hashTag);
+			List<Hashtag> hashtags = tweet.getHashtags();
+			hashtags.add(hashTag);
+			tweet.setHashtags(hashtags);;
+			
+			// Sets tweet for hashtag
+			List<Tweet> tweets = hashTag.getTweets();
+			tweets.add(tweet);
+			hashTag.setTweets(tweets);
+			
+			System.out.println(hashTag.getLabel());
 
 		}
 	}
