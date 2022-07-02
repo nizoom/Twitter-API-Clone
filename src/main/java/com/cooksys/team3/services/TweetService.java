@@ -7,7 +7,6 @@ import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.HashtagDto;
 import com.cooksys.team3.dtos.TweetRequestDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
-import com.cooksys.team3.dtos.UserRequestDto;
 import com.cooksys.team3.dtos.UserResponseDto;
 
 public interface TweetService {
@@ -32,9 +31,9 @@ public interface TweetService {
 	// -------------------- POST METHODS --------------------
 	TweetResponseDto createTweet(TweetRequestDto tweetRequestDto);
 
-	void likeTweet(Long tweetId, UserRequestDto userRequestDto);
+	void likeTweet(Long tweetId, CredentialsDto credentialsDto);
 
-	TweetResponseDto repostTweet(Long id, UserRequestDto userRequestDto);
+	TweetResponseDto repostTweet(Long id, CredentialsDto credentialsDto);
 
 	TweetResponseDto replyTweet(Long id, TweetRequestDto tweetRequestDto);
 

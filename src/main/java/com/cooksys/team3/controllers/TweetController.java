@@ -17,7 +17,6 @@ import com.cooksys.team3.dtos.CredentialsDto;
 import com.cooksys.team3.dtos.HashtagDto;
 import com.cooksys.team3.dtos.TweetRequestDto;
 import com.cooksys.team3.dtos.TweetResponseDto;
-import com.cooksys.team3.dtos.UserRequestDto;
 import com.cooksys.team3.dtos.UserResponseDto;
 import com.cooksys.team3.services.TweetService;
 
@@ -79,13 +78,13 @@ public class TweetController {
 	}
 
 	@PostMapping("/{id}/like")
-	public void likeTweet(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto) {
-		tweetService.likeTweet(id, userRequestDto);
+	public void likeTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+		tweetService.likeTweet(id, credentialsDto);
 	}
 
 	@PostMapping("/{id}/repost")
-	public TweetResponseDto repostTweet(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto) {
-		return tweetService.repostTweet(id, userRequestDto);
+	public TweetResponseDto repostTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+		return tweetService.repostTweet(id, credentialsDto);
 	}
 
 	@PostMapping("/{id}/reply")
